@@ -1,5 +1,9 @@
 from typing import Callable
+
 from math import ceil, floor
+
+from .utils import is_modulo_zero
+
 
 # We supposed that the indexing set is a subsequence of [0, 1, 2, 3, ...]
 
@@ -42,18 +46,21 @@ class NSequence(object):
     """
 
     def __init__(
-        self,
-        *,
-        func: Callable[[int], float],
-        inverse_func: Callable[[float], float | int] = None,
-        initial_position=0,
-        **kwargs,
+            self,
+            *,
+            func: Callable[[int], float],
+            inverse_func: Callable[[float], float | int] = None,
+            # positions_func: Callable[[int], int] = None,
+            initial_position=0,
+            **kwargs,
     ) -> None:
         super().__init__()
         # FIXME: Ensure funcs are callables
         self._func = func
         self._inverse_func = inverse_func
         self._initial_position = initial_position
+        # FIXME: Complexe funcs
+        # self._positions_func = positions_func or (lambda x: x + 1)
         self._kwargs = kwargs or {}
 
     def nth_term(self, n: int):
@@ -61,8 +68,19 @@ class NSequence(object):
         return self._func(n)
 
     def sum_up_to_nth_term(self, n: int):
-        """Computes the sum of the sequence up to the nth term."""
-        sum_to_return = 0
+        """
+        Computes the sum of the sequence up to the nth term.
+        `n` is the position of a the nth term of the sequence.
+
+        If the sequence's initial position is -2 then the `nth` term here
+        is the sequence's term at the nth position, counting from -2. The count
+        is made here regarding the sequence's initial position
+        """
+
+        if n < 1:
+            raise NSequenceException(
+                f"Expect position to be at least equal to `1`, but got {n}"
+            )
 
         sum_up_func: Callable[[int, dict], float] = self._kwargs.get("sum_up_func")
         if sum_up_func and callable(sum_up_func):
@@ -76,10 +94,10 @@ class NSequence(object):
                 [
                     self._func(position)
                     for position in range(
-                        self._initial_position, n - self._initial_position + 1 + 1
-                        # The last +1 helps to include the `itself` as a position to
-                        # considerate in the sommation
-                    )
+                    self._initial_position, n - self._initial_position + 1 + 1
+                )
+                    # The last `+1` helps to include the `n` itself as a position to
+                    # considerate in the sum
                 ]
             )
 
@@ -112,11 +130,7 @@ class NSequence(object):
         if not raise_exception_if_not_exact:
             return position
 
-        if position % 1 != 0:
-            raise NSequenceException(
-                f"Expect `inverse_fun` to give integers as results but got a float"
-                f"with non-zero decimal {position}"
-            )
+        self._ensure_positions_are_integers(position)
 
         return int(position)
 
@@ -135,7 +149,7 @@ class NSequence(object):
         NSequenceException: If inverse_func is not defined or not callable.
         """
 
-        if not self.is_inversible:
+        if not self.is_invertible:
             raise NSequenceException(
                 f"Expect `inverse_func` to be defined and to be callable but got {self._inverse_func}"
             )
@@ -143,7 +157,14 @@ class NSequence(object):
         term1_position = self._inverse_func(term1)
         term2_position = self._inverse_func(term2)
 
-        return self.count_terms_between(term1_position, term2_position)
+        # Ensure that all the computed positions are integers
+
+        self._ensure_positions_are_integers(
+            term1_position, term2_position
+        )
+
+        # Provide the int versions of positions for count computation
+        return self.count_terms_between(int(term1_position), int(term2_position))
 
     @staticmethod
     def count_terms_between(n1: int, n2: int):
@@ -173,7 +194,7 @@ class NSequence(object):
         Raises:
         NSequenceException: If inverse_func is not defined or not callable.
         """
-        if not self.is_inversible:
+        if not self.is_invertible:
             raise NSequenceException(
                 f"Expect `inverse_func` to be defined and to be callable but got {self._inverse_func}"
             )
@@ -181,9 +202,10 @@ class NSequence(object):
         term1_position = self._inverse_func(term1)
         term2_position = self._inverse_func(term2)
 
-        return self.terms_between(term1_position, term2_position)
+        # Raise an exception if any position is not integer
+        self._ensure_positions_are_integers(term1_position, term2_position)
 
-        ""
+        return self.terms_between(int(term1_position), int(term2_position))
 
     def terms_between(self, n1: int, n2: int, include_args_terms=True):
         """
@@ -218,9 +240,10 @@ class NSequence(object):
         int: The position of the nearest term to term_neighbor.
         """
 
+        # Here the `term_neighbor` position can be float
         term_neighbor_position = self._inverse_func(term_neighbor)
 
-        if term_neighbor_position % 1 == 0:
+        if is_modulo_zero(term_neighbor_position):
             # The provided term is a term of the sequence so do nothing
             return term_neighbor_position
 
@@ -234,8 +257,8 @@ class NSequence(object):
         right_distance_to_neighbor = abs(term_neighbor - right_nearest_term)
 
         if (
-            not prefer_left_term
-            and left_distance_to_neighbor == right_distance_to_neighbor
+                not prefer_left_term
+                and left_distance_to_neighbor == right_distance_to_neighbor
         ):
             return right_nearest_term_position
 
@@ -246,12 +269,12 @@ class NSequence(object):
         )
 
     def nearest_term(
-        self, term_neighbor: float, *, prefer_left_term=True
+            self, term_neighbor: float, *, prefer_left_term=True
     ) -> tuple[float, int]:
         """Gets the nearest term in the sequence to the given `term_neighbor`."""
         return self._func(
             self.nearest_term_position(
-                term_neighbor, prefere_left_term=prefer_left_term
+                term_neighbor, prefer_left_term=prefer_left_term
             )
         )
 
@@ -271,3 +294,13 @@ class NSequence(object):
     def is_invertible(self):
         """Checks if the sequence is invertible."""
         return self._inverse_func or callable(self._inverse_func)
+
+    @classmethod
+    def _ensure_positions_are_integers(cls, *positions):
+        for position in positions:
+            # Raise an exception if the position is not an integer
+            if not is_modulo_zero(position):
+                raise NSequenceException(
+                    f"Expect `inverse_fun` to give integers as results but got a float "
+                    f"with non-zero decimal {position}"
+                )
