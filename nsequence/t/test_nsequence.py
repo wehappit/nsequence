@@ -206,7 +206,7 @@ class TestExceptionRaising(unittest.TestCase):
             func=lambda x: x,
             initial_position=1,
             # Bad inverse
-            inverse_func=0
+            inverse_func="not callable"
         )
 
         with self.assertRaises(NSequenceException) as context:

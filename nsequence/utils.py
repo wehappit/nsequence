@@ -1,9 +1,8 @@
-def is_modulo_zero(n: float | int, mod=1) -> bool:
+def is_floating_integer(n: float) -> bool:
     """
-    Checks if `n%mod` is zero
-    Use if a float is an integer
+    True if `n` is a float with just zeros after the decimal point
     """
     return n % 1 == 0
 
 
-
+def default_indexing_func(position: int)
