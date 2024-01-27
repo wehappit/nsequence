@@ -1,3 +1,4 @@
+import functools
 from typing import Callable
 
 from math import ceil, floor
@@ -6,6 +7,7 @@ from .utils import is_floating_integer
 
 
 # We supposed that the indexing set is a subsequence of [0, 1, 2, 3, ...]
+
 
 class NSequenceException(Exception):
     base_message = "NSequenceException"
@@ -51,23 +53,26 @@ class NSequence(object):
         The indexing function maps the position of a given term to its index.
     """
 
-    default_indexing_func: Callable[[int, int], int] = lambda position, initial_index: initial_index + position - 1
-    default_initial_index = 0
-    default_inverse_func = None
+    POSITIONS_LIMIT = 1_000_000
+
     def __init__(
-            self,
-            *,
-            func: Callable[[int], float],
-            inverse_func: Callable[[float], float | int] = None,
-            indexing_func: Callable[[int], int] = None,
-            initial_position=0,
-            initial_index=0,
-            **kwargs,
+        self,
+        *,
+        func: Callable[[int], float],
+        inverse_func: Callable[[float], float | int] = None,
+        indexing_func: Callable[[int], int] = None,
+        initial_position=0,
+        initial_index=0,
+        **kwargs,
     ) -> None:
         super().__init__()
 
         # Ensure that the provided functions are callables
-        for fn in (func, inverse_func, indexing_func,):
+        for fn in (
+            func,
+            inverse_func,
+            indexing_func,
+        ):
             if fn is not None and not callable(fn):
                 raise NSequenceException(
                     f"Expect a callable .i.e a function but got non callable object {fn}"
@@ -75,7 +80,7 @@ class NSequence(object):
 
         # This function may hold the implementation of a recursive sequence.
         # In that case, the client could have cache add caching capability to
-        # the function
+        # the function.
         self._func = func
 
         # The supposed inverse of `self._func`
@@ -86,7 +91,9 @@ class NSequence(object):
 
         # The indexing function takes a position (of a term in the sequence) and gives
         # its index. Such function maps `{1, 2, 3,.., }` to the sequence indices set
-        self._indexing_func = indexing_func or (lambda position: self._initial_index + position - 1)
+        self._indexing_func = indexing_func or (
+            lambda position: self._initial_index + position - 1
+        )
 
         # FIXME: Complexe funcs
         # Extra data
@@ -126,13 +133,7 @@ class NSequence(object):
         else:
             # No `sum_up_func` func provided through kwargs
             sum_to_return = sum(
-                [
-                    self._func(index)
-                    for index in range(
-                        self._initial_index, n - self._initial_index + 1 + 1
-                    )
-                    # The last `+1` helps to include the `nth` index in the sum range
-                ]
+                [self.nth_term(position) for position in range(1, n + 1)]
             )
 
         return sum_to_return
@@ -193,26 +194,37 @@ class NSequence(object):
 
         # Ensure that all the computed indices are integers
 
-        self._ensure_indices_are_integers(
-            term1_index, term2_index
-        )
+        self._ensure_indices_are_integers(term1_index, term2_index)
 
         # Provide the int versions of indices for the count computation
         return self.count_terms_between(int(term1_index), int(term2_index))
 
-    @staticmethod
-    def count_terms_between(n1: int, n2: int):
+    def count_terms_between(self, index1: int, index2: int):
         """
         Counts the number of terms between two given indices in the sequence.
+        The number of terms is the number of valid indices between `index1` and
+        `index2` according to `indexing_func`
 
         Parameters:
-        - n1 (int): The first index.
-        - n2 (int): The second index.
+        - index1 (int): The first index.
+        - index2 (int): The second index.
 
         Returns:
-        int: The number of terms between n1 and n2.
+        int: The number of terms between index1 and index2.
         """
-        return abs(n2 - n1) + 1
+
+        terms_counting_func: Callable[[int, int], int] = self._kwargs.get(
+            "terms_counting_func"
+        )
+
+        if terms_counting_func:
+            # TODO: Check if callable in __init__
+            return terms_counting_func(index1, index2)
+
+        index1_position = self.index_position(index1)
+        index2_position = self.index_position(index2)
+
+        return self.__count_positions_between(index1_position, index2_position)
 
     def terms_between_terms(self, term1: float, term2: float):
         """
@@ -226,10 +238,10 @@ class NSequence(object):
         List[float]: The terms between term1 and term2.
 
         Raises:
-        NSequenceException: If inverse_func is not defined or not callable.
+        TypeError: If inverse_func is not defined or not callable.
         """
         if not self.is_invertible:
-            raise NSequenceException(
+            raise TypeError(
                 f"Expect `inverse_func` to be defined and to be callable but got {self._inverse_func}"
             )
 
@@ -241,30 +253,41 @@ class NSequence(object):
 
         return self.terms_between(int(term1_index), int(term2_index))
 
-    def terms_between(self, index1: int, index2: int, include_args_terms=True):
+    def terms_between(self, index1: int, index2: int):
         """
         Lists the terms between two given indices in the sequence.
 
         Parameters:
         - index1 (int): The first index.
         - index2 (int): The second index.
-        - include_args_terms (bool): If True, includes the terms at index1 and index2.
 
         Returns:
-        List[float]: The terms between index1 and index2, optionally including index1 and index2.
+        List[float]: The terms between index1 and index2
         """
-        range_inf = min(index1, index2)
-        range_sup = max(index1, index2)
+        index1 = min(index1, index2)
+        index2 = max(index1, index2)
 
-        if not include_args_terms:
-            range_inf = range_inf + 1
-            range_sup = range_sup - 1
+        index1_position = self.index_position(index1)
+        index2_position = self.index_position(index2)
 
-        return [self._func(index) for index in range(range_inf, range_sup + 1)]
+        return [
+            self._func(self._indexing_func(position))
+            for position in range(index1_position, index2_position + 1)
+        ]
 
-    def nearest_term_index(self, term_neighbor: float, *, prefer_left_term=True):
+    def nearest_term_index(
+        self,
+        term_neighbor: float,
+        *,
+        inversion_technic=True,
+        starting_position=1,
+        iter_limit=1000,
+        prefer_left_term=True,
+    ):
         """
         Finds the index of the nearest term in the sequence to a given term.
+
+        !!! Attention: if `inversion_technic=True`, it means that we will use self._func reverse
 
         Parameters:
         - term_neighbor (float): The term for which to find the nearest index.
@@ -274,10 +297,20 @@ class NSequence(object):
         int: The index of the nearest term to term_neighbor.
         """
 
-        # Here the index of `term_neighbor` can be float because it
-        # may not one of the sequence's terms.
-        term_neighbor_index = self._inverse_func(term_neighbor)
+        if not inversion_technic:
+            __, nearest_term_index = self.__naively_get_sequence_nearest_pair(
+                term_neighbor,
+                starting_position=starting_position,
+                iter_limit=iter_limit,
+                prefer_left_term=prefer_left_term,
+            )
+            return nearest_term_index
 
+        # Here the index of `term_neighbor` can be float because it
+        # may not be one of the sequence's terms.
+        term_neighbor_index = self._inverse_func(term_neighbor)
+        # TODO:
+        # HOW TO
         if is_floating_integer(term_neighbor_index):
             # The provided term is a term of the sequence so do nothing
             return term_neighbor_index
@@ -292,8 +325,8 @@ class NSequence(object):
         right_distance_to_neighbor = abs(term_neighbor - right_nearest_term)
 
         if (
-                not prefer_left_term
-                and left_distance_to_neighbor == right_distance_to_neighbor
+            not prefer_left_term
+            and left_distance_to_neighbor == right_distance_to_neighbor
         ):
             return right_nearest_term_index
 
@@ -304,13 +337,27 @@ class NSequence(object):
         )
 
     def nearest_term(
-            self, term_neighbor: float, *, prefer_left_term=True
-    ) -> tuple[float, int]:
+        self,
+        term_neighbor: float,
+        *,
+        inversion_technic=True,
+        starting_position=1,
+        iter_limit=1000,
+        prefer_left_term=True,
+    ) -> float:
         """Gets the nearest term in the sequence to the given `term_neighbor`."""
-        return self._func(
-            self.nearest_term_index(
-                term_neighbor, prefer_left_term=prefer_left_term
+
+        if not inversion_technic:
+            nearest_term, __ = self.__naively_get_sequence_nearest_pair(
+                term_neighbor,
+                starting_position=starting_position,
+                iter_limit=iter_limit,
+                prefer_left_term=prefer_left_term,
             )
+            return nearest_term
+
+        return self._func(
+            self.nearest_term_index(term_neighbor, prefer_left_term=prefer_left_term)
         )
 
     # PROPERTIES
@@ -329,6 +376,69 @@ class NSequence(object):
     def is_invertible(self):
         """Checks if the sequence is invertible."""
         return self._inverse_func
+
+    @functools.lru_cache(maxsize=128)
+    def index_position(self, index: int) -> int:
+        indexing_inverse_func: Callable[[int], int] = self._kwargs(
+            "indexing_inverse_func"
+        )
+        if indexing_inverse_func:
+            # The `indexing_inverse_func` is provided
+            return indexing_inverse_func(index)
+        try:
+            position_of_index = next(
+                p
+                for p in range(1, self.POSITIONS_LIMIT)
+                if self._indexing_func(p) == index
+            )
+        except StopIteration as exc:
+            raise NSequenceException(
+                f"Index {index} not found within the first {self.POSITIONS_LIMIT} positions of the sequence."
+            ) from exc
+
+        return position_of_index
+
+    def __create_sequence_pairs_generator(self, terms_limit=1000, starting_position=1):
+        # https://stackoverflow.com/questions/1995418/python-generator-expression-vs-yield
+        for position in range(starting_position, starting_position + terms_limit):
+            # Index of the position .i.e the `position_th` index
+            position_index = self._indexing_func(position)
+            yield position_index, self._func(position_index)
+
+    @functools.lru_cache(maxsize=128)
+    def __naively_get_sequence_nearest_pair(
+        self,
+        term_neighbor: float,
+        starting_position=1,
+        iter_limit=1000,
+        prefer_left_term=True,
+    ):
+        # You have a good/better idea ? Let's discuss it
+        lazy_generated_pairs = self.__create_sequence_pairs_generator(
+            iter_limit=iter_limit, starting_position=starting_position
+        )
+        for index, term in lazy_generated_pairs:
+            distance = abs(term - term_neighbor)
+            if (distance == min_distance and not prefer_left_term) or (
+                distance < min_distance
+            ):
+                min_distance = distance
+                nearest_term_index = index
+                nearest_term = term
+        return nearest_term_index, nearest_term
+
+    @functools.lru_cache(maxsize=128)
+    def __get_sequence_nearest_pair(
+        self,
+        term_neighbor: float,
+        starting_position=1,
+        iter_limit=1000,
+        prefer_left_term=True,
+    ):
+        pass
+    @staticmethod
+    def __count_positions_between(position1: int, position2: int) -> int:
+        return abs(position2 - position1) + 1
 
     @classmethod
     def _ensure_indices_are_integers(cls, *indices):
