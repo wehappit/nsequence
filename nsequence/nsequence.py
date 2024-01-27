@@ -5,7 +5,7 @@ from math import ceil, floor
 
 
 # TODO: Doc about funcs monotony and continuity
-
+# TODO: Fix typing
 
 class NSequenceException(Exception):
     base_message = "NSequenceException"
@@ -292,15 +292,19 @@ class NSequence(object):
         Returns:
         int: The index of the nearest term to term_neighbor.
         """
-
-        if not inversion_technic:
+        if inversion_technic:
+            _, nearest_term_index = self.__inversely_get_sequence_nearest_pair(
+                term_neighbor,
+                prefer_left_term=prefer_left_term,
+            )
+        else:
             _, nearest_term_index = self.__naively_get_sequence_nearest_pair(
                 term_neighbor,
                 starting_position=starting_position,
                 iter_limit=iter_limit,
                 prefer_left_term=prefer_left_term,
             )
-            return nearest_term_index
+        return nearest_term_index
 
     def nearest_term(
         self,
@@ -398,7 +402,7 @@ class NSequence(object):
         self,
         term_neighbor: float,
         prefer_left_term=True,
-    ):
+    )->tuple[int, float | int]:
         # Here the index of `term_neighbor` can be float because it
         # may not be one of the sequence's terms.
         term_neighbor_index = self._inverse_func(term_neighbor)
