@@ -6,6 +6,7 @@ from math import ceil, floor
 
 # TODO: Doc about funcs monotony and continuity
 # TODO: Fix typing
+# TODO: Remove self._kwargs usages
 
 class NSequenceException(Exception):
     base_message = "NSequenceException"
