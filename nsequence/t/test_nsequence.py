@@ -4,6 +4,7 @@ from nsequence import NSequence
 
 identity = lambda x: x
 
+
 class TestNSequenceInstantiation(unittest.TestCase):
 
     def test_should_instantiate_nsequence_with_minimal_params(self):
