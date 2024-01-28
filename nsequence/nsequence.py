@@ -8,7 +8,6 @@ from math import ceil, floor
 # TODO: Doc about funcs monotony and continuity
 # TODO: Fix docstrings
 # TODO: Fix typing (some funcs should have float / int or float as return type
-# TODO: Remove NSequenceException refs
 # TODO: Some default functions setting
 
 class ArityMismatchError(Exception):
@@ -19,9 +18,9 @@ class ArityMismatchError(Exception):
 
 
 class UnexpectedPositionError(Exception):
-    def __init__(self, position):
+    def __init__(self, msg):
         super().__init__(
-            f"Int expected as position but got {position}"
+            msg
         )
 
 
@@ -39,7 +38,7 @@ class InversionError(Exception):
         )
 
 
-class IndexNotFoundError():
+class IndexNotFoundError(Exception):
     def __init__(self, msg):
         super().__init__(
             msg
@@ -152,7 +151,7 @@ class NSequence(object):
         int: The index of the given term in the sequence.
 
         Raises:
-        NSequenceException: If inverse_func is not defined, or if the index is not an integer.
+        InversionError: If inverse_func is not defined, or if the index is not an integer.
         """
         if not self.is_invertible:
             raise InversionError(
@@ -180,7 +179,7 @@ class NSequence(object):
         int: The number of terms between term1 and term2.
 
         Raises:
-        NSequenceException: If inverse_func is not defined or not callable.
+        InversionError: If inverse_func is not defined or not callable.
         """
 
         if not self.is_invertible:
