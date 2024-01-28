@@ -1,14 +1,38 @@
 import unittest
 
-from nsequence import NSequence, NSequenceException
+from nsequence import NSequence
 
+identity = lambda x: x
 
-class TestNSequenceInstanciation(unittest.TestCase):
-    def test_should_instantiate_sequence_instance(self):
+class TestNSequenceInstantiation(unittest.TestCase):
+
+    def test_should_instantiate_nsequence_with_minimal_params(self):
+        """
+        Ensure we can instantiate with minimal param(s)
+        """
         self.assertIsInstance(
             NSequence(
-                func=lambda x: x,
-                initial_position=1,
+                func=identity,
+            ),
+            NSequence,
+        )
+
+    def test_should_instantiate_nsequence_with_maximal_params(self):
+        """
+        Ensure we can instantiate with every parameter set
+        """
+
+        # We don't care about the correctness of function-like parameters
+        # here.
+        self.assertIsInstance(
+            NSequence(
+                func=identity,
+                inverse_func=identity,
+                indexing_func=identity,
+                indexing_inverse_func=identity,
+                sum_up_func=identity,
+                terms_between_counting_func=lambda x, y: abs(x - y) + 1,
+                initial_index=0,
             ),
             NSequence,
         )
