@@ -1,6 +1,6 @@
 import unittest
 
-from nsequence import NSequence
+from nsequence import NSequence, UnexpectedIndexError, UnexpectedPositionError, InversionError
 
 identity = lambda x: x
 
@@ -213,7 +213,7 @@ class TestExceptionRaising(unittest.TestCase):
             inverse_func=lambda y: 1 / y,
         )
 
-        with self.assertRaises(NSequenceException) as context:
+        with self.assertRaises(UnexpectedIndexError) as context:
             sequence.count_terms_between_terms(3, 4)
 
         self.assertTrue(
@@ -229,7 +229,7 @@ class TestExceptionRaising(unittest.TestCase):
             inverse_func="not callable",
         )
 
-        with self.assertRaises(NSequenceException) as context:
+        with self.assertRaises(InversionError) as context:
             sequence.position_of_term(3)
 
         self.assertTrue(
@@ -243,11 +243,23 @@ class TestExceptionRaising(unittest.TestCase):
             initial_index=1,
         )
 
-        with self.assertRaises(NSequenceException) as context:
+        param = -20
+        with self.assertRaises(ValueError) as context:
             sequence.sum_up_to_nth_term(-20)
 
-        self.assertTrue(
-            "Expect position to be at least equal to `1`" in context.exception.msg
+        self.assertEqual(
+            f"Expect position to be at least `1`, but got {param}" , context.exception.msg
+        )
+
+        param = 29.3
+
+        with self.assertRaises(UnexpectedPositionError) as context:
+            sequence.sum_up_to_nth_term(-20)
+
+        self.assertEqual(
+            f"Expect `positions` to be list of integers (only) but actually "
+            f"got a list containing float(s) with non zeros decimals {[param]}", context.exception.msg
+
         )
 
 

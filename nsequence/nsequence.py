@@ -116,6 +116,8 @@ class NSequence(object):
         if n < 1:
             raise ValueError(f"Expect position to be at least `1`, but got {n}")
 
+        self.__validate_positions(n)
+
         if self._sum_up_func:
             sum_to_return = self._sum_up_func(
                 n,
@@ -480,8 +482,8 @@ class NSequence(object):
         try:
             cls.__validate_integers(*values_to_validate)
         except ValueError as exc:
-            raise UnexpectedIndexError(
-                f"Expect `indices` to be list of integers (only) but actually "
+            raise UnexpectedPositionError(
+                f"Expect `positions` to be list of integers (only) but actually "
                 f"got a list containing float(s) with non zeros decimals {values_to_validate}"
             ) from exc
 
