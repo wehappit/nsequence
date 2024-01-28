@@ -491,8 +491,8 @@ class NSequence(object):
             )
         except ValueError as exc:
             raise UnexpectedIndexError(
-                f"Expect an `indices` to be an integers (list of integers) but actually "
-                f"got floats with non zeros decimals {values_to_validate}"
+                f"Expect `indices` to be list of integers (only) but actually "
+                f"got a list containing float(s) with non zeros decimals {values_to_validate}"
             ) from exc
 
     @classmethod
@@ -503,8 +503,8 @@ class NSequence(object):
             )
         except ValueError as exc:
             raise UnexpectedIndexError(
-                f"Expect an `indices` to be an integers (list of integers) but actually "
-                f"got floats with non zeros decimals {values_to_validate}"
+                f"Expect an `indices` to be a list of integers but actually "
+                f"got a list containing float(s) with non zeros decimals {values_to_validate}"
             ) from exc
 
     @classmethod
@@ -539,7 +539,7 @@ class NSequence(object):
 
         if func_arity != expected_arity:
             raise ArityMismatchError(
-                func_name=getattr(func_to_validate, "name", None),
+                func_name=getattr(func_to_validate, "name", ""),
                 expected_arity=expected_arity,
                 actual_arity=func_arity,
             )
