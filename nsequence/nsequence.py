@@ -484,7 +484,7 @@ class NSequence(object):
         except ValueError as exc:
             raise UnexpectedPositionError(
                 f"Expect `positions` to be list of integers (only) but actually "
-                f"got a list containing float(s) with non zeros decimals {values_to_validate}"
+                f"got a list containing float(s) with non zero decimal(s) {values_to_validate}"
             ) from exc
 
     @classmethod
@@ -494,7 +494,7 @@ class NSequence(object):
         except ValueError as exc:
             raise UnexpectedIndexError(
                 f"Expect an `indices` to be a list of integers but actually "
-                f"got a list containing float(s) with non zeros decimals {values_to_validate}"
+                f"got a list containing float(s) with non zero decimal(s) {values_to_validate}"
             ) from exc
 
     @classmethod

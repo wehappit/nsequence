@@ -258,7 +258,7 @@ class TestExceptionRaising(unittest.TestCase):
 
         self.assertEqual(
             f"Expect `positions` to be list of integers (only) but actually "
-            f"got a list containing float(s) with non zeros decimals {[param]}", context.exception.msg
+            f"got a list containing float(s) with non zero decimal(s) {[param]}", context.exception.msg
 
         )
 
