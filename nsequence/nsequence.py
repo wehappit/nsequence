@@ -51,14 +51,13 @@ class NSequence(object):
         sum_up_func: Callable[[int], float] = None,
         terms_between_counting_func: Callable[[int, int], int] = None,
         initial_index=0,
-        **kwargs,
     ) -> None:
         super().__init__()
 
         self.__validate_func(func, expected_arity=1, is_optional=False)
 
         _optional_funcs_entries = [
-            # (func, expected_arity)
+            # (function, expected_arity)
             (inverse_func, 1),
             (indexing_func, 1),
             (indexing_inverse_func, 1),

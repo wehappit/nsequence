@@ -1,3 +1,3 @@
 import pytest
 
-from .nsequence import NSequence, NSequenceException
+from .nsequence import NSequence, UnexpectedIndexError, UnexpectedPositionError, IndexNotFoundError

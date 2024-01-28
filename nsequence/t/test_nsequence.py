@@ -44,7 +44,7 @@ class TestNSequenceMethods(unittest.TestCase):
         self.invertible_sequence = NSequence(
             func=lambda x: x**4 + 9,
             inverse_func=lambda y: (y - 9) ** (1 / 4),
-            initial_position=1,
+            initial_index=1,
         )
         self.non_invertible_sequence = NSequence(
             # The `func` provided here does not matter because for
@@ -64,11 +64,11 @@ class TestNSequenceMethods(unittest.TestCase):
         self.assertEqual(self.invertible_sequence.nth_term(2), 16 + 9)
 
     def test__sum_up_nth_term(self):
-        # Ensure that the sum to the initial_position gives the first term
+        # Ensure that the sum to the initial_index gives the first term
         # of the sequence
         self.assertEqual(
             self.invertible_sequence.sum_up_to_nth_term(
-                self.invertible_sequence.initial_position
+                self.invertible_sequence.initial_index
             ),
             10,
         )
@@ -200,15 +200,15 @@ class TestNSequenceMethods(unittest.TestCase):
     def test__initial_term(self):
         self.assertEqual(self.invertible_sequence.initial_term, 1**2 + 9)
 
-    def test__initial_position(self):
-        self.assertEqual(self.invertible_sequence.initial_position, 1)
+    def test__initial_index(self):
+        self.assertEqual(self.invertible_sequence.initial_index, 1)
 
 
 class TestExceptionRaising(unittest.TestCase):
     def test_should_raise_exception_if_inversion_gives_non_zero_decimal_float(self):
         sequence = NSequence(
             func=lambda x: x,
-            initial_position=1,
+            initial_index=1,
             # Bad inverse
             inverse_func=lambda y: 1 / y,
         )
@@ -224,7 +224,7 @@ class TestExceptionRaising(unittest.TestCase):
     def test_should_raise_exception_if_inverse_fun_is_not_callable(self):
         sequence = NSequence(
             func=lambda x: x,
-            initial_position=1,
+            initial_index=1,
             # Bad inverse
             inverse_func="not callable",
         )
@@ -240,7 +240,7 @@ class TestExceptionRaising(unittest.TestCase):
     def test_should_raise_exception_if_sum_up_nth_term_gets_bad_param(self):
         sequence = NSequence(
             func=lambda x: x,
-            initial_position=1,
+            initial_index=1,
         )
 
         with self.assertRaises(NSequenceException) as context:
@@ -257,7 +257,7 @@ class TestKwargs(unittest.TestCase):
         # Provide a bad sum_up_fun and ensure that we get the sum from it
         sequence = NSequence(
             func=lambda x: x**x + 1,
-            initial_position=7,
+            initial_index=7,
             # Bad sum_up_fun, but it does not matter as long as it is different from
             # the sequence `func`. But be carefull to not get into coincidence.
             sum_up_func=lambda x, **kwargs: x + 1,
