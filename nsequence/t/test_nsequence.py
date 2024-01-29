@@ -32,7 +32,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
                 indexing_func=identity,
                 indexing_inverse_func=identity,
                 sum_up_func=identity,
-                terms_between_counting_func=lambda x, y: abs(x - y) + 1,
+                terms_between_indices_counting_func=lambda x, y: abs(x - y) + 1,
                 initial_index=0,
             ),
             NSequence,
@@ -251,6 +251,7 @@ class TestExceptionRaising(unittest.TestCase):
             f"Expect position to be at least `1`, but got {param}" , context.exception.msg
         )
 
+        # Decimal position
         param = 29.3
 
         with self.assertRaises(UnexpectedPositionError) as context:
