@@ -244,7 +244,7 @@ class NSequence(object):
             starting_position=1,
             iter_limit=1000,
             prefer_left_term=True,
-    ) -> float | int:
+    ) -> number:
         """Gets the nearest term in the sequence to the given `term_neighbor`."""
 
         _, nearest_term = self.nearest_entry(
@@ -370,7 +370,7 @@ class NSequence(object):
             self,
             term_neighbor: float,
             prefer_left_term=True,
-    ) -> tuple[int, float | int]:
+    ) -> tuple[int, number]:
         # Here the index of `term_neighbor` can be floated because it
         # may not be one of the sequence's terms.
         term_neighbor_index = self._inverse_func(term_neighbor)
