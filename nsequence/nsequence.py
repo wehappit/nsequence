@@ -10,6 +10,7 @@ from math import ceil, floor
 
 number = int | float
 
+
 class ArityMismatchError(Exception):
     def __init__(self, message):
         super().__init__(message)
@@ -21,10 +22,12 @@ class UnexpectedPositionError(Exception):
         super().__init__(message)
         self.message = message
 
+
 class UnexpectedIndexError(Exception):
     def __init__(self, message):
         super().__init__(message)
         self.message = message
+
 
 class InversionError(Exception):
     def __init__(self, message):
@@ -110,7 +113,7 @@ class NSequence(object):
 
     # METHODS FOR INVERTIBLE SEQUENCES
 
-    def index_of_term(self, term: float, raise_not_exact_exception=True)-> int:
+    def index_of_term(self, term: float, raise_not_exact_exception=True) -> int:
         """
         Computes the index of a given term in the sequence.
 
@@ -138,7 +141,8 @@ class NSequence(object):
 
         return int(index)
 
-    def count_terms_between_terms(self, term1: float, term2: float)->int:
+    def count_terms_between_terms(self, term1: float, term2: float) -> int:
+
         """
         Counts the number of terms between two given terms in the sequence.
 
@@ -155,7 +159,7 @@ class NSequence(object):
 
         if not self._inverse_func:
             raise InversionError(
-                "Cannot calculate `count_terms_between_terms` for sequence "
+                "Cannot calculate `count_terms_between_indices_terms` for sequence "
                 "without `inverse_func`. It was not set.",
             )
 

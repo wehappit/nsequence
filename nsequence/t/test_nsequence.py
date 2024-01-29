@@ -251,6 +251,20 @@ class TestExceptionRaising(unittest.TestCase):
                 context.value.message
             )
 
+<<<<<<< HEAD
+=======
+        # Decimal position
+        param = 29.3
+
+        with self.assertRaises(UnexpectedPositionError) as context:
+            sequence.sum_up_to_nth_term(-20)
+
+        self.assertEqual(
+            f"Expect `positions` to be list of integers (only) but actually "
+            f"got a list containing float(s) with non zero decimal(s) {[param]}", context.exception.msg
+
+        )
+>>>>>>> bc11924bab00da98961dffce070db2ae301ff310
 
 
 class TestKwargs(unittest.TestCase):
