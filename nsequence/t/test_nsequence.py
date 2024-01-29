@@ -1,9 +1,8 @@
 import unittest
-
+import pytest
 from nsequence import NSequence, UnexpectedIndexError, UnexpectedPositionError, InversionError
 
 identity = lambda x: x
-
 
 class TestNSequenceInstantiation(unittest.TestCase):
 
@@ -42,7 +41,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
 class TestNSequenceMethods(unittest.TestCase):
     def setUp(self):
         self.invertible_sequence = NSequence(
-            func=lambda x: x**4 + 9,
+            func=lambda x: x ** 4 + 9,
             inverse_func=lambda y: (y - 9) ** (1 / 4),
             initial_index=1,
         )
@@ -198,7 +197,7 @@ class TestNSequenceMethods(unittest.TestCase):
         self.assertFalse(self.non_invertible_sequence.is_invertible)
 
     def test__initial_term(self):
-        self.assertEqual(self.invertible_sequence.initial_term, 1**2 + 9)
+        self.assertEqual(self.invertible_sequence.initial_term, 1 ** 2 + 9)
 
     def test__initial_index(self):
         self.assertEqual(self.invertible_sequence.initial_index, 1)
@@ -213,55 +212,45 @@ class TestExceptionRaising(unittest.TestCase):
             inverse_func=lambda y: 1 / y,
         )
 
-        with self.assertRaises(UnexpectedIndexError) as context:
+        with pytest.raises(UnexpectedIndexError) as context:
             sequence.count_terms_between_terms(3, 4)
 
-        self.assertTrue(
-            "Expect `inverse_fun` to give integers as results but got a float"
-            in context.exception.msg
+        self.assertIn(
+            "Expect an `indices` to be a tuple of integers, but actually got a "
+            "tuple of float(s) with non zero decimal(s) ",
+            context.value.message
         )
 
-    def test_should_raise_exception_if_inverse_fun_is_not_callable(self):
+    def test_should_raise_exception_if_inverse_func_is_set_to_non_function_object(self):
+        with pytest.raises(TypeError) as context:
+            NSequence(
+                func=lambda x: x,
+                initial_index=1,
+                # Bad inverse
+                inverse_func="bad object as func",
+            )
+
+        self.assertTrue(
+            "Expect a function, but got `bad object as func`"
+            in context.value.args[0]
+        )
+
+    def test_should_raise_exception_if_sum_up_nth_term_gets_bad_position(self):
         sequence = NSequence(
             func=lambda x: x,
             initial_index=1,
-            # Bad inverse
-            inverse_func="not callable",
         )
 
-        with self.assertRaises(InversionError) as context:
-            sequence.position_of_term(3)
+        for bad_param in (-20, 29.31, 2.1, 2.00001):
+            with pytest.raises(UnexpectedPositionError) as context:
+                sequence.sum_up_to_nth_term(bad_param)
 
-        self.assertTrue(
-            "Expect `inverse_func` to be defined and to be callable"
-            in context.exception.msg
-        )
+            self.assertIn(
+                "Expect `positions` to be tuple of integers (only from 1), but actually "
+                "got a tuple of float(s) with non zero decimal(s) ",
+                context.value.message
+            )
 
-    def test_should_raise_exception_if_sum_up_nth_term_gets_bad_param(self):
-        sequence = NSequence(
-            func=lambda x: x,
-            initial_index=1,
-        )
-
-        param = -20
-        with self.assertRaises(ValueError) as context:
-            sequence.sum_up_to_nth_term(-20)
-
-        self.assertEqual(
-            f"Expect position to be at least `1`, but got {param}" , context.exception.msg
-        )
-
-        # Decimal position
-        param = 29.3
-
-        with self.assertRaises(UnexpectedPositionError) as context:
-            sequence.sum_up_to_nth_term(-20)
-
-        self.assertEqual(
-            f"Expect `positions` to be list of integers (only) but actually "
-            f"got a list containing float(s) with non zero decimal(s) {[param]}", context.exception.msg
-
-        )
 
 
 class TestKwargs(unittest.TestCase):
@@ -269,7 +258,7 @@ class TestKwargs(unittest.TestCase):
     def test_should_sum_up_using_the_provided_sum_up_func(self):
         # Provide a bad sum_up_fun and ensure that we get the sum from it
         sequence = NSequence(
-            func=lambda x: x**x + 1,
+            func=lambda x: x ** x + 1,
             initial_index=7,
             # Bad sum_up_fun, but it does not matter as long as it is different from
             # the sequence `func`. But be carefull to not get into coincidence.

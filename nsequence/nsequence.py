@@ -7,36 +7,35 @@ from math import ceil, floor
 # TODO: Doc about funcs monotony and continuity
 # TODO: Fix docstrings
 # TODO: Fix typing (some funcs should have float / int or float as return type
-# TODO: Some default functions setting
 
 number = int | float
 
-
 class ArityMismatchError(Exception):
-    def __init__(self, func_name, expected_arity, actual_arity):
-        super().__init__(
-            f"Function {func_name} expected {expected_arity} arguments but got {actual_arity}"
-        )
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
 
 
 class UnexpectedPositionError(Exception):
-    def __init__(self, msg):
-        super().__init__(msg)
-
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
 
 class UnexpectedIndexError(Exception):
-    def __init__(self, msg):
-        super().__init__(msg)
-
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
 
 class InversionError(Exception):
-    def __init__(self, msg):
-        super().__init__(msg)
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
 
 
 class IndexNotFoundError(Exception):
-    def __init__(self, msg):
-        super().__init__(msg)
+    def __init__(self, message):
+        super().__init__(message)
+        self.message = message
 
 
 class NSequence(object):
@@ -139,7 +138,7 @@ class NSequence(object):
 
         return int(index)
 
-    def count_terms_between_indices_terms(self, term1: float, term2: float)->int:
+    def count_terms_between_terms(self, term1: float, term2: float)->int:
         """
         Counts the number of terms between two given terms in the sequence.
 
@@ -156,7 +155,7 @@ class NSequence(object):
 
         if not self._inverse_func:
             raise InversionError(
-                "Cannot calculate `count_terms_between_indices_terms` for sequence "
+                "Cannot calculate `count_terms_between_terms` for sequence "
                 "without `inverse_func`. It was not set.",
             )
 
@@ -381,7 +380,7 @@ class NSequence(object):
                 term_neighbor_index
         ):
             raise UnexpectedIndexError(
-                f"Expect index of position {term_neighbor_position} to be an integer "
+                f"Expect index of position {term_neighbor_position} to be an integer, "
                 f"but it was {term_neighbor_index}"
             )
 
@@ -435,8 +434,8 @@ class NSequence(object):
             cls.__validate_integers(*values_to_validate, min_value=1)
         except ValueError as exc:
             raise UnexpectedPositionError(
-                f"Expect `positions` to be list of integers (only from 1) but actually "
-                f"got a list containing float(s) with non zero decimal(s) {values_to_validate}"
+                "Expect `positions` to be tuple of integers (only from 1), but actually "
+                f"got a tuple of float(s) with non zero decimal(s) `{values_to_validate}`"
             ) from exc
 
     @classmethod
@@ -445,8 +444,8 @@ class NSequence(object):
             cls.__validate_integers(*values_to_validate)
         except ValueError as exc:
             raise UnexpectedIndexError(
-                f"Expect an `indices` to be a list of integers but actually "
-                f"got a list containing float(s) with non zero decimal(s) {values_to_validate}"
+                f"Expect an `indices` to be a tuple of integers, but actually got a "
+                f"tuple of float(s) with non zero decimal(s) {values_to_validate}"
             ) from exc
 
     @classmethod
@@ -478,14 +477,12 @@ class NSequence(object):
             return
 
         if not inspect.isfunction(func_to_validate):
-            raise TypeError(f"Expect a function but got {func_to_validate}")
+            raise TypeError(f"Expect a function, but got `{func_to_validate}`")
 
         func_signature = inspect.signature(func_to_validate)
         func_arity = len(func_signature.parameters)
 
         if func_arity != expected_arity:
             raise ArityMismatchError(
-                func_name=getattr(func_to_validate, "name", ""),
-                expected_arity=expected_arity,
-                actual_arity=func_arity,
+                f"Function {getattr(func_to_validate, 'name', '')} expected {expected_arity} arguments but got {func_arity}"
             )
