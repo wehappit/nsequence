@@ -4,11 +4,12 @@ from typing import Callable, Any
 
 from math import ceil, floor
 
-
 # TODO: Doc about funcs monotony and continuity
 # TODO: Fix docstrings
 # TODO: Fix typing (some funcs should have float / int or float as return type
 # TODO: Some default functions setting
+
+number = int | float
 
 
 class ArityMismatchError(Exception):
@@ -42,15 +43,13 @@ class NSequence(object):
     POSITION_LIMIT = 1_000_000
 
     def __init__(
-        self,
-        *,
-        func: Callable[[int], float],
-        inverse_func: Callable[[float], float | int] = None,
-        indexing_func: Callable[[int], int] = None,
-        indexing_inverse_func: Callable[[int], int] = None,
-        sum_up_func: Callable[[int], float] = None,
-        terms_between_counting_func: Callable[[int, int], int] = None,
-        initial_index=0,
+            self,
+            *,
+            func: Callable[[int], number],
+            inverse_func: Callable[[number], number] = None,
+            indexing_func: Callable[[int], int] = None,
+            indexing_inverse_func: Callable[[number], number] = None,
+            initial_index=0,
     ) -> None:
         super().__init__()
 
@@ -61,8 +60,6 @@ class NSequence(object):
             (inverse_func, 1),
             (indexing_func, 1),
             (indexing_inverse_func, 1),
-            (sum_up_func, 1),
-            (terms_between_counting_func, 2),
         ]
 
         for _opt_func, _arity in _optional_funcs_entries:
@@ -82,58 +79,39 @@ class NSequence(object):
         # The starting index of the sequence
         self._initial_index = initial_index
 
-        #
-        self._sum_up_func = sum_up_func
-
-        self._terms_between_counting_func = terms_between_counting_func
-
         # The indexing function takes a position (of a term in the sequence) and gives
         # its index. Such function maps `{1, 2, 3,.., }` to the sequence indices set
-        self._indexing_func = indexing_func or (
-            lambda position: self._initial_index + position - 1
-        )
 
-    def nth_term(self, n: int):
+        if not indexing_func:
+            # Use the default indexing func and its inverse
+            self._indexing_func = lambda position: self._initial_index + position - 1
+            self._indexing_inverse_func = lambda index: index - self._initial_index + 1
+
+    def nth_term(self, n: int) -> number:
         """Computes the nth term of the sequence"""
 
-        # Compute the index of the nth term
-        nth_term_index = self._indexing_func(n)
+        return self._func(self._indexing_func(n))
 
-        return self._func(nth_term_index)
-
-    def sum_up_to_nth_term(self, n: int):
-        """
-        Computes the sum of the sequence up to the nth term.
-        `n` is the position of a the nth term of the sequence.
-
-        For instance, if the sequence's initial index is -2 then the `nth` term
-        here is the sequence's term at the nth position, counting from -2 . The count
-        is made here regarding the sequence's initial position
-
-        TODO: Improve this doc
-        """
-
-        if n < 1:
-            raise ValueError(f"Expect position to be at least `1`, but got {n}")
+    def sum_up_to_nth_term(self, n: int) -> number:
 
         self.__validate_positions(n)
 
-        if self._sum_up_func:
-            sum_to_return = self._sum_up_func(
-                n,
-                initial_index=self._initial_index,
-            )
-        else:
-            # No `sum_up_func` defined
+        try:
             sum_to_return = sum(
                 [self.nth_term(position) for position in range(1, n + 1)]
             )
+        except TypeError as exc:
+            raise NotImplementedError(
+                "Failed to compute the sequence n first terms sum with the default `sump_up_func`."
+                "The default `sump_up_func` implementation seems not appropriate for your use case."
+                "You should provide your own `sum_up_func` implementation."
+            ) from exc
 
         return sum_to_return
 
     # METHODS FOR INVERTIBLE SEQUENCES
 
-    def index_of_term(self, term: float, raise_not_exact_exception=True):
+    def index_of_term(self, term: float, raise_not_exact_exception=True)-> int:
         """
         Computes the index of a given term in the sequence.
 
@@ -147,7 +125,7 @@ class NSequence(object):
         Raises:
         InversionError: If inverse_func is not defined, or if the index is not an integer.
         """
-        if not self.is_invertible:
+        if not self._inverse_func:
             raise InversionError(
                 "Cannot calculate `index_of_term` for sequence without `inverse_func`. It was not set.",
             )
@@ -161,7 +139,7 @@ class NSequence(object):
 
         return int(index)
 
-    def count_terms_between_terms(self, term1: float, term2: float):
+    def count_terms_between_indices_terms(self, term1: float, term2: float)->int:
         """
         Counts the number of terms between two given terms in the sequence.
 
@@ -176,9 +154,9 @@ class NSequence(object):
         InversionError: If inverse_func is not defined or not callable.
         """
 
-        if not self.is_invertible:
+        if not self._inverse_func:
             raise InversionError(
-                "Cannot calculate `count_terms_between_terms` for sequence "
+                "Cannot calculate `count_terms_between_indices_terms` for sequence "
                 "without `inverse_func`. It was not set.",
             )
 
@@ -190,46 +168,20 @@ class NSequence(object):
         self.__validate_indices(term1_index, term2_index)
 
         # Provide the int versions of indices for the count computation
-        return self.count_terms_between(int(term1_index), int(term2_index))
+        return self.count_terms_between_indices(int(term1_index), int(term2_index))
 
-    def count_terms_between(self, index1: int, index2: int):
-        """
-        Counts the number of terms between two given indices in the sequence.
-        The number of terms is the number of valid indices between `index1` and
-        `index2` according to `indexing_func`
-
-        Parameters:
-        - index1 (int): The first index.
-        - index2 (int): The second index.
-
-        Returns:
-        int: The number of terms between index1 and index2.
-        """
-
-        if self._terms_between_counting_func:
-            return self._terms_between_counting_func(index1, index2)
-
+    def count_terms_between_indices(self, index1: int, index2: int):
+        # The dev can override if the impl is not the one he wants
         index1_position = self.index_position(index1)
         index2_position = self.index_position(index2)
 
         return self.__count_positions_between(index1_position, index2_position)
 
     def terms_between_terms(self, term1: float, term2: float):
-        """
-        Lists the terms between two given terms in the sequence.
 
-        Parameters:
-        - term1 (float): The first term.
-        - term2 (float): The second term.
-
-        Returns:
-        List[float]: The terms between term1 and term2.
-
-        Raises:
-        TypeError: If inverse_func is not defined or not callable.
-        """
-        if not self.is_invertible:
-            raise TypeError(
+        if not self._inverse_func:
+            # TODO: Improve msg
+            raise InversionError(
                 f"Expect `inverse_func` to be defined but got {self._inverse_func}"
             )
 
@@ -242,16 +194,7 @@ class NSequence(object):
         return self.terms_between(int(term1_index), int(term2_index))
 
     def terms_between(self, index1: int, index2: int):
-        """
-        Lists the terms between two given indices in the sequence.
 
-        Parameters:
-        - index1 (int): The first index.
-        - index2 (int): The second index.
-
-        Returns:
-        List[float]: The terms between index1 and index2
-        """
         index1 = min(index1, index2)
         index2 = max(index1, index2)
 
@@ -264,12 +207,12 @@ class NSequence(object):
         ]
 
     def nearest_term_index(
-        self,
-        term_neighbor: float,
-        inversion_technic=True,
-        starting_position=1,
-        iter_limit=1000,
-        prefer_left_term=True,
+            self,
+            term_neighbor: float,
+            inversion_technic=True,
+            starting_position=1,
+            iter_limit=1000,
+            prefer_left_term=True,
     ):
         """
         Finds the index of the nearest term in the sequence to a given term.
@@ -295,12 +238,12 @@ class NSequence(object):
         return nearest_term_index
 
     def nearest_term(
-        self,
-        term_neighbor: float,
-        inversion_technic=True,
-        starting_position=1,
-        iter_limit=1000,
-        prefer_left_term=True,
+            self,
+            term_neighbor: float,
+            inversion_technic=True,
+            starting_position=1,
+            iter_limit=1000,
+            prefer_left_term=True,
     ) -> float | int:
         """Gets the nearest term in the sequence to the given `term_neighbor`."""
 
@@ -315,14 +258,27 @@ class NSequence(object):
         return nearest_term
 
     def nearest_entry(
-        self,
-        term_neighbor: float,
-        inversion_technic=bool,
-        starting_position=1,
-        iter_limit=1000,
-        prefer_left_term=True,
+            self,
+            term_neighbor: float,
+            inversion_technic=bool,
+            starting_position=1,
+            iter_limit=1000,
+            prefer_left_term=True,
     ):
-        # `iter_limit` and `starting_position` are ignored if `inversion_technic` is `True`.
+        """
+        `iter_limit` and `starting_position` are ignored if `inversion_technic` is `True`.
+
+        Args:
+            term_neighbor:
+            inversion_technic:
+            starting_position:
+            iter_limit:
+            prefer_left_term:
+
+        Returns:
+
+        """
+        #
 
         # We prefer caching the result one level down in other to avoid caching the same
         # entry many times when the developer misuse the method by providing `iter_limit`
@@ -377,11 +333,6 @@ class NSequence(object):
         """Gets the initial term of the sequence."""
         return self._func(self._initial_index)
 
-    @property
-    def is_invertible(self):
-        """Checks if the sequence is invertible."""
-        return self._inverse_func
-
     def __create_sequence_pairs_generator(self, terms_limit=1000, starting_position=1):
         # https://stackoverflow.com/questions/1995418/python-generator-expression-vs-yield
         for position in range(starting_position, starting_position + terms_limit):
@@ -391,11 +342,11 @@ class NSequence(object):
 
     @functools.lru_cache(maxsize=128)
     def __naively_get_sequence_nearest_entry(
-        self,
-        term_neighbor: float,
-        starting_position=1,
-        iter_limit=1000,
-        prefer_left_term=True,
+            self,
+            term_neighbor: float,
+            starting_position=1,
+            iter_limit=1000,
+            prefer_left_term=True,
     ):
         # You have another idea ? Let's discuss it
 
@@ -405,7 +356,7 @@ class NSequence(object):
         for index, term in lazy_generated_pairs:
             distance = abs(term - term_neighbor)
             if (distance == min_distance and not prefer_left_term) or (
-                distance < min_distance
+                    distance < min_distance
             ):
                 min_distance = distance
                 nearest_term_index = index
@@ -416,9 +367,9 @@ class NSequence(object):
 
     @functools.lru_cache(maxsize=128)
     def __inversely_get_sequence_nearest_entry(
-        self,
-        term_neighbor: float,
-        prefer_left_term=True,
+            self,
+            term_neighbor: float,
+            prefer_left_term=True,
     ) -> tuple[int, float | int]:
         # Here the index of `term_neighbor` can be floated because it
         # may not be one of the sequence's terms.
@@ -427,7 +378,7 @@ class NSequence(object):
 
         # If position is integer then index should too
         if self.__is_integer(term_neighbor_position) and not self.__is_integer(
-            term_neighbor_index
+                term_neighbor_index
         ):
             raise UnexpectedIndexError(
                 f"Expect index of position {term_neighbor_position} to be an integer "
@@ -435,11 +386,11 @@ class NSequence(object):
             )
 
         if all(
-            self.__is_integer(val)
-            for val in (
-                term_neighbor_position,
-                term_neighbor_index,
-            )
+                self.__is_integer(val)
+                for val in (
+                        term_neighbor_position,
+                        term_neighbor_index,
+                )
         ):
             # The provided term is a term of the sequence so do nothing
             return term_neighbor_index, term_neighbor
@@ -454,8 +405,8 @@ class NSequence(object):
         right_distance_to_neighbor = abs(term_neighbor - right_nearest_term)
 
         if (
-            not prefer_left_term
-            and left_distance_to_neighbor == right_distance_to_neighbor
+                not prefer_left_term
+                and left_distance_to_neighbor == right_distance_to_neighbor
         ):
             nearest_term_position = right_nearest_term_position
         elif left_distance_to_neighbor > right_distance_to_neighbor:
@@ -479,11 +430,12 @@ class NSequence(object):
 
     @classmethod
     def __validate_positions(cls, *values_to_validate):
+
         try:
-            cls.__validate_integers(*values_to_validate)
+            cls.__validate_integers(*values_to_validate, min_value=1)
         except ValueError as exc:
             raise UnexpectedPositionError(
-                f"Expect `positions` to be list of integers (only) but actually "
+                f"Expect `positions` to be list of integers (only from 1) but actually "
                 f"got a list containing float(s) with non zero decimal(s) {values_to_validate}"
             ) from exc
 
@@ -498,17 +450,23 @@ class NSequence(object):
             ) from exc
 
     @classmethod
-    def __validate_integers(cls, *values_to_validate):
+    def __validate_integers(cls, *values_to_validate, **constraints):
         # Caller wants to ensure that all provided values are integers
         # or are decimals with zeros after the decimal point
+
+        # Add more constraints if needed
+        min_value = constraints.get("min_value", None)
+
         for value in values_to_validate:
-            # Raise an exception if `value` is not an integer
-            if not cls.__is_integer(value):
-                raise ValueError(f"Expect an integer but got {value}")
+
+            # Raise an exception if `value` is not an integer or does not respect the constraints
+            if not cls.__is_integer(value) or min_value > value:
+                constraints_msg = f" with constraints {constraints}" if constraints else ""
+                raise ValueError(f"Expect an integer{constraints_msg}, but got {value}")
 
     @staticmethod
     def __validate_func(
-        func_to_validate: Any, expected_arity: int = 0, is_optional=True
+            func_to_validate: Any, expected_arity: int = 0, is_optional=True
     ):
         """
         Ensure that `func_to_validate` is a function and has the correct number of
