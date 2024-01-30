@@ -4,6 +4,7 @@ from nsequence import NSequence, UnexpectedIndexError, UnexpectedPositionError, 
 
 identity = lambda x: x
 
+
 class TestNSequenceInstantiation(unittest.TestCase):
 
     def test_should_instantiate_nsequence_with_minimal_params(self):
@@ -30,15 +31,104 @@ class TestNSequenceInstantiation(unittest.TestCase):
                 inverse_func=identity,
                 indexing_func=identity,
                 indexing_inverse_func=identity,
-                sum_up_func=identity,
-                terms_between_indices_counting_func=lambda x, y: abs(x - y) + 1,
                 initial_index=0,
             ),
             NSequence,
         )
 
+    def test_should_not_instantiate_nsequence_func_not_provided(self):
+        with pytest.raises(TypeError) as context:
+            NSequence(
+                inverse_func=identity,
+                indexing_func=identity,
+                indexing_inverse_func=identity,
+                initial_index=0,
+            )
 
-class TestNSequenceMethods(unittest.TestCase):
+        self.assertIn(
+            "NSequence.__init__() missing 1 required keyword-only argument: 'func'",
+            context.value.args[0]
+        )
+
+    def test_should_not_instantiate_nsequence_if_any_bad_object_provided_as_function(self):
+        with pytest.raises(TypeError) as context:
+            NSequence(
+                func=lambda x: x,
+                initial_index=1,
+                # Bad inverse
+                inverse_func="bad object as func",
+            )
+
+        self.assertTrue(
+            "Expect a function, but got `bad object as func`",
+            context.value.args[0]
+        )
+
+        with pytest.raises(TypeError) as context:
+            NSequence(
+                func=lambda x: x,
+                initial_index=1,
+                # Bad objects as functions
+                indexing_func="bad object as func",
+            )
+
+        self.assertIn(
+            "Expect a function, but got `bad object as func`",
+            context.value.args[0]
+        )
+
+        with pytest.raises(TypeError) as context:
+            NSequence(
+                func=lambda x: x,
+                initial_index=1,
+                # Bad objects as functions
+                indexing_inverse_func=list
+            )
+
+        self.assertIn(
+            f"Expect a function, but got `{list}`",
+            context.value.args[0]
+        )
+
+        with pytest.raises(TypeError) as context:
+            NSequence(
+                func=lambda x: x,
+                initial_index=1,
+                # Bad objects as functions
+                inverse_func=dict,
+                indexing_func=list,
+                indexing_inverse_func="bad object as func",
+            )
+
+        # No need to match 100% of the message here, cause done enough previously
+        self.assertIn(
+            "Expect a function, but got ",
+            context.value.args[0]
+        )
+
+
+class BaseNSequenceMethodTestCase(unittest.TestCase):
+    def setUp(self):
+        self.invertible_sequence = NSequence(
+            func=lambda x: x ** 4 + 9,
+            inverse_func=lambda y: (y - 9) ** (1 / 4),
+            initial_index=1,
+        )
+        self.non_invertible_sequence = NSequence(
+            # The `func` provided here does not matter because for
+            # inversion, we just check if `inverse_fun` is callable
+            func=lambda x: abs(x - 10),
+            inverse_func=None,
+        )
+
+    def tearDown(self):
+        # We are not doing side effect operations yet.
+        # del self.invertible_sequence
+        # def self.non_invertible_sequence
+        super().tearDown()
+
+# TODO: Aller methode par methode : TestNSequenceSumUpNTh,.....
+class TestNSequenceMethods(BaseNSequenceMethodTestCase):
     def setUp(self):
         self.invertible_sequence = NSequence(
             func=lambda x: x ** 4 + 9,
@@ -221,20 +311,6 @@ class TestExceptionRaising(unittest.TestCase):
             context.value.message
         )
 
-    def test_should_raise_exception_if_inverse_func_is_set_to_non_function_object(self):
-        with pytest.raises(TypeError) as context:
-            NSequence(
-                func=lambda x: x,
-                initial_index=1,
-                # Bad inverse
-                inverse_func="bad object as func",
-            )
-
-        self.assertTrue(
-            "Expect a function, but got `bad object as func`"
-            in context.value.args[0]
-        )
-
     def test_should_raise_exception_if_sum_up_nth_term_gets_bad_position(self):
         sequence = NSequence(
             func=lambda x: x,
@@ -250,21 +326,6 @@ class TestExceptionRaising(unittest.TestCase):
                 "got a tuple of float(s) with non zero decimal(s) ",
                 context.value.message
             )
-
-<<<<<<< HEAD
-=======
-        # Decimal position
-        param = 29.3
-
-        with self.assertRaises(UnexpectedPositionError) as context:
-            sequence.sum_up_to_nth_term(-20)
-
-        self.assertEqual(
-            f"Expect `positions` to be list of integers (only) but actually "
-            f"got a list containing float(s) with non zero decimal(s) {[param]}", context.exception.msg
-
-        )
->>>>>>> bc11924bab00da98961dffce070db2ae301ff310
 
 
 class TestKwargs(unittest.TestCase):
