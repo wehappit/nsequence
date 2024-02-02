@@ -1,8 +1,17 @@
 import unittest
 import pytest
-from nsequence import NSequence, UnexpectedIndexError, UnexpectedPositionError, InversionError
+from nsequence import (
+    NSequence,
+    UnexpectedIndexError,
+    UnexpectedPositionError,
+    InversionError,
+)
+from .utils import i_x, a_x, l_x, q_x, c_x, h_x
 
 identity = lambda x: x
+
+
+# TODO: Test that the initial_index provided by the dev will be ignored if indexing_fun
 
 
 class TestNSequenceInstantiation(unittest.TestCase):
@@ -13,7 +22,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
         """
         self.assertIsInstance(
             NSequence(
-                func=identity,
+                func=i_x,
             ),
             NSequence,
         )
@@ -27,16 +36,16 @@ class TestNSequenceInstantiation(unittest.TestCase):
         # here.
         self.assertIsInstance(
             NSequence(
-                func=identity,
-                inverse_func=identity,
-                indexing_func=identity,
-                indexing_inverse_func=identity,
+                func=i_x,
+                inverse_func=i_x,
+                indexing_func=i_x,
+                indexing_inverse_func=i_x,
                 initial_index=0,
             ),
             NSequence,
         )
 
-    def test_should_not_instantiate_nsequence_func_not_provided(self):
+    def test_should_not_instantiate_nsequence_if_func_not_provided(self):
         with pytest.raises(TypeError) as context:
             NSequence(
                 inverse_func=identity,
@@ -47,10 +56,12 @@ class TestNSequenceInstantiation(unittest.TestCase):
 
         self.assertIn(
             "NSequence.__init__() missing 1 required keyword-only argument: 'func'",
-            context.value.args[0]
+            context.value.args[0],
         )
 
-    def test_should_not_instantiate_nsequence_if_any_bad_object_provided_as_function(self):
+    def test_should_not_instantiate_nsequence_if_any_bad_object_provided_as_function(
+        self,
+    ):
         with pytest.raises(TypeError) as context:
             NSequence(
                 func=lambda x: x,
@@ -60,8 +71,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
             )
 
         self.assertTrue(
-            "Expect a function, but got `bad object as func`",
-            context.value.args[0]
+            "Expect a function, but got `bad object as func`", context.value.args[0]
         )
 
         with pytest.raises(TypeError) as context:
@@ -73,8 +83,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
             )
 
         self.assertIn(
-            "Expect a function, but got `bad object as func`",
-            context.value.args[0]
+            "Expect a function, but got `bad object as func`", context.value.args[0]
         )
 
         with pytest.raises(TypeError) as context:
@@ -82,13 +91,10 @@ class TestNSequenceInstantiation(unittest.TestCase):
                 func=lambda x: x,
                 initial_index=1,
                 # Bad objects as functions
-                indexing_inverse_func=list
+                indexing_inverse_func=list,
             )
 
-        self.assertIn(
-            f"Expect a function, but got `{list}`",
-            context.value.args[0]
-        )
+        self.assertIn(f"Expect a function, but got `{list}`", context.value.args[0])
 
         with pytest.raises(TypeError) as context:
             NSequence(
@@ -101,16 +107,171 @@ class TestNSequenceInstantiation(unittest.TestCase):
             )
 
         # No need to match 100% of the message here, cause done enough previously
-        self.assertIn(
-            "Expect a function, but got ",
-            context.value.args[0]
+        self.assertIn("Expect a function, but got ", context.value.args[0])
+
+
+class TestNthTermComputation(unittest.TestCase):
+
+    def test_should_compute_nth_term_if_no_indexing_func_provided(self):
+        """
+        Ensure the default indexing func is used.
+        The default initial_index is 0.
+        """
+        nsequence1 = NSequence(
+            func=a_x,
         )
+
+        # Ensure the first term computed is correct
+
+        self.assertEqual(nsequence1.nth_term(1), 20)
+
+        self.assertEqual(nsequence1.nth_term(1000), 979)
+
+        # Set an initial_index
+        nsequence2 = NSequence(
+            func=a_x,
+            inverse_func=None,
+            initial_index=5,
+        )
+
+        self.assertEqual(nsequence2.nth_term(1), 15)
+
+        self.assertEqual(nsequence2.nth_term(1000), 984)
+
+    def test_should_compute_nth_term_if_indexing_func_provided(self):
+        """
+        Ensure the provided `indexing_func` is used.
+        When an indexing function is provided, the default
+        `initial_index` is `indexing_func(1)`
+        """
+
+        nsequence1 = NSequence(
+            func=a_x,
+            indexing_func=c_x,
+        )
+
+        # Ensure the first term computed is correct
+
+        self.assertEqual(nsequence1.nth_term(1), 21)
+
+        self.assertEqual(nsequence1.nth_term(1000), 998999979)
+
+
+class TestSumUpToNthTermComputation(unittest.TestCase):
+
+    def test_should_fail_if_bad_position_is_provided(self):
+        sequence = NSequence(
+            func=i_x,
+            initial_index=1,
+        )
+
+        for bad_param in (-20, 29.31, 2.1, 2.00001):
+            with pytest.raises(UnexpectedPositionError) as context:
+                sequence.sum_up_to_nth_term(bad_param)
+
+            self.assertIn(
+                "Expect `positions` to be tuple of integers (only from 1), but actually "
+                "got a tuple of float(s) with non zero decimal(s) ",
+                context.value.message,
+            )
+
+    def test_should_fail_if_sequence_nth_term_failed(self):
+        sequence = NSequence(
+            func=h_x,
+            # Make `nth_term` failed
+            initial_index=0,
+        )
+
+        with pytest.raises(NotImplementedError) as exc_info:
+            sequence.sum_up_to_nth_term(10)
+
+        self.assertIn(
+            "Failed to compute the sequence's n first terms sum with the default `sump_up_func`."
+            "The default `sump_up_func` implementation seems not appropriate for your use case."
+            "You should provide your own `sum_up_func` implementation.",
+            exc_info.value.args[0],
+        )
+
+    def test_should_compute_sum_up_to_nth_term_if_no_indexing_func_provided(self):
+        sequence1 = NSequence(
+            func=q_x,
+        )
+
+        # Ensure we get the correct sum if position is 1. We are supposed
+        # to get the first term of the sequence. As `indexing_func` is not
+        # provided, the default initial_index is 0
+        self.assertEqual(
+            sequence1.sum_up_to_nth_term(1),
+            9,
+        )
+
+        # Ensure that correct sum is returned if position is 5
+        # 0**4 + 1**4 + 2**4 + 3**4 + 4**4 + (9*5) = 399
+        self.assertEqual(sequence1.sum_up_to_nth_term(5), 399)
+
+        # Sequence with initial_index
+
+        sequence1 = NSequence(
+            func=q_x,
+            initial_index=2,
+        )
+
+        # Ensure we get the correct sum if position is 1.
+        self.assertEqual(
+            sequence1.sum_up_to_nth_term(1),
+            25,
+        )
+
+        # Ensure that correct sum is returned if position is 5
+        # 2**4 + 3**4 + 4**4 + + 5**4 + 6**4 + (9*5) = 2319
+        self.assertEqual(sequence1.sum_up_to_nth_term(5), 2319)
+
+    def test_should_compute_sum_up_to_nth_term_if_indexing_func_provided(self):
+        sequence1 = NSequence(
+            func=q_x,
+            indexing_func=l_x,
+        )
+
+        # Ensure we get the correct sum if position is 1. We are supposed
+        # to get the first term of the sequence.
+        self.assertEqual(
+            sequence1.sum_up_to_nth_term(1),
+            2410,
+        )
+
+        sequence2 = NSequence(
+            func=q_x,
+            indexing_func=l_x,
+        )
+
+        self.assertEqual(
+            sequence2.sum_up_to_nth_term(3),
+            53309,
+        )
+
+
+class TestIndexOfTermComputation(unittest.TestCase):
+    # to be continued
+    def test_should_fail_if_no_inverse_func_provided(self):
+        sequence = NSequence(
+            func=a_x,
+        )
+
+        with pytest.raises(InversionError) as exc_info:
+            # The provided term as arg does not matter here
+            sequence.index_of_term(3, naive_technic=False)
+            self.assertEqual(
+                "Cannot calculate `index_of_term` for sequence without `inverse_func` and with "
+                "`naive_technic=False` set. You need either to provide `inverse_func` or set "
+                "`naive_technic` to `True`",
+                exc_info.value.message,
+            )
 
 
 class BaseNSequenceMethodTestCase(unittest.TestCase):
     def setUp(self):
         self.invertible_sequence = NSequence(
-            func=lambda x: x ** 4 + 9,
+            func=lambda x: x**4 + 9,
             inverse_func=lambda y: (y - 9) ** (1 / 4),
             initial_index=1,
         )
@@ -127,16 +288,17 @@ class BaseNSequenceMethodTestCase(unittest.TestCase):
         # def self.non_invertible_sequence
         super().tearDown()
 
+
 # TODO: Aller methode par methode : TestNSequenceSumUpNTh,.....
 class TestNSequenceMethods(BaseNSequenceMethodTestCase):
     def setUp(self):
         self.invertible_sequence = NSequence(
-            func=lambda x: x ** 4 + 9,
+            func=lambda x: x**4 + 9,
             inverse_func=lambda y: (y - 9) ** (1 / 4),
             initial_index=1,
         )
         self.non_invertible_sequence = NSequence(
-            # The `func` provided here does not matter because for
+            # The `func` provided here does not matter because, for
             # inversion, we just check if `inverse_fun` is callable
             func=lambda x: abs(x - 10),
             inverse_func=None,
@@ -287,7 +449,7 @@ class TestNSequenceMethods(BaseNSequenceMethodTestCase):
         self.assertFalse(self.non_invertible_sequence.is_invertible)
 
     def test__initial_term(self):
-        self.assertEqual(self.invertible_sequence.initial_term, 1 ** 2 + 9)
+        self.assertEqual(self.invertible_sequence.initial_term, 1**2 + 9)
 
     def test__initial_index(self):
         self.assertEqual(self.invertible_sequence.initial_index, 1)
@@ -308,24 +470,8 @@ class TestExceptionRaising(unittest.TestCase):
         self.assertIn(
             "Expect an `indices` to be a tuple of integers, but actually got a "
             "tuple of float(s) with non zero decimal(s) ",
-            context.value.message
+            context.value.message,
         )
-
-    def test_should_raise_exception_if_sum_up_nth_term_gets_bad_position(self):
-        sequence = NSequence(
-            func=lambda x: x,
-            initial_index=1,
-        )
-
-        for bad_param in (-20, 29.31, 2.1, 2.00001):
-            with pytest.raises(UnexpectedPositionError) as context:
-                sequence.sum_up_to_nth_term(bad_param)
-
-            self.assertIn(
-                "Expect `positions` to be tuple of integers (only from 1), but actually "
-                "got a tuple of float(s) with non zero decimal(s) ",
-                context.value.message
-            )
 
 
 class TestKwargs(unittest.TestCase):
@@ -333,7 +479,7 @@ class TestKwargs(unittest.TestCase):
     def test_should_sum_up_using_the_provided_sum_up_func(self):
         # Provide a bad sum_up_fun and ensure that we get the sum from it
         sequence = NSequence(
-            func=lambda x: x ** x + 1,
+            func=lambda x: x**x + 1,
             initial_index=7,
             # Bad sum_up_fun, but it does not matter as long as it is different from
             # the sequence `func`. But be carefull to not get into coincidence.

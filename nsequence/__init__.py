@@ -1,3 +1,8 @@
 import pytest
 
-from .nsequence import NSequence, UnexpectedIndexError, UnexpectedPositionError, InversionError
+from .nsequence import (
+    NSequence,
+    UnexpectedIndexError,
+    UnexpectedPositionError,
+    InversionError,
+)
