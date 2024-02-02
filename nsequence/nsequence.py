@@ -90,9 +90,7 @@ class NSequence(object):
             # the one computed from the `indexing_func`
             self._indexing_func = indexing_func
             self._initial_index = indexing_func(1)
-            self._auto_indexing = False
         else:
-            self._auto_indexing = True
             # Use the default indexing func and its inverse
             self._indexing_func = lambda position: self._initial_index + position - 1
             self._indexing_inverse_func = lambda index: index - self._initial_index + 1
