@@ -121,7 +121,7 @@ class NSequence(object):
     def index_of_term(
         self, term: float, naive_technic=True, exact_exception=True
     ) -> int:
-        # DOCME: naive_technic is ignored if the sequence inversion fun is provided
+        # DOCME: naive_technic is ignored if the sequence inversion func is provided
         """
         Computes the index of a given term in the sequence.
 
@@ -161,7 +161,7 @@ class NSequence(object):
 
             # Raising an exception depends on the value of `exact_exception`
             # So, if the position_of_index is None, __validate_indices will raise the
-            # exception for us in the next lines
+            # exception for us in the next lines if `exact_exception` is True
             index = (
                 self._indexing_func(position_of_index) if position_of_index else None
             )
