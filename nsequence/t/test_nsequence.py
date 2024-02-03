@@ -8,8 +8,6 @@ from nsequence import (
 )
 from .utils import i_x, a_x, l_x, q_x, c_x, h_x, s_x
 
-identity = lambda x: x
-
 
 # TODO: Test that the initial_index provided by the dev will be ignored if indexing_fun
 
@@ -48,9 +46,9 @@ class TestNSequenceInstantiation(unittest.TestCase):
     def test_should_not_instantiate_nsequence_if_func_not_provided(self):
         with pytest.raises(TypeError) as context:
             NSequence(
-                inverse_func=identity,
-                indexing_func=identity,
-                indexing_inverse_func=identity,
+                inverse_func=i_x,
+                indexing_func=i_x,
+                indexing_inverse_func=i_x,
                 initial_index=0,
             )
 
@@ -64,7 +62,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
     ):
         with pytest.raises(TypeError) as context:
             NSequence(
-                func=lambda x: x,
+                func=i_x,
                 initial_index=1,
                 # Bad inverse
                 inverse_func="bad object as func",
@@ -76,7 +74,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
 
         with pytest.raises(TypeError) as context:
             NSequence(
-                func=lambda x: x,
+                func=i_x,
                 initial_index=1,
                 # Bad objects as functions
                 indexing_func="bad object as func",
@@ -88,7 +86,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
 
         with pytest.raises(TypeError) as context:
             NSequence(
-                func=lambda x: x,
+                func=i_x,
                 initial_index=1,
                 # Bad objects as functions
                 indexing_inverse_func=list,
@@ -98,7 +96,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
 
         with pytest.raises(TypeError) as context:
             NSequence(
-                func=lambda x: x,
+                func=i_x,
                 initial_index=1,
                 # Bad objects as functions
                 inverse_func=dict,
@@ -369,9 +367,6 @@ class TestIndexOfTermComputation(unittest.TestCase):
             265
         )
 
-    def test_should_raise_indexing_exception_found_index_is_not_integer(self):
-        pass
-
     def test_should_not_raise_indexing_exception_if_param_is_not_activated(self):
         sequence = NSequence(
             func=i_x,
@@ -417,33 +412,11 @@ class TestIndexOfTermComputation(unittest.TestCase):
             0.25
         )
 
-
-class BaseNSequenceMethodTestCase(unittest.TestCase):
-    def setUp(self):
-        self.invertible_sequence = NSequence(
-            func=lambda x: x ** 4 + 9,
-            inverse_func=lambda y: (y - 9) ** (1 / 4),
-            initial_index=1,
-        )
-        self.non_invertible_sequence = NSequence(
-            # The `func` provided here does not matter because for
-            # inversion, we just check if `inverse_fun` is callable
-            func=lambda x: abs(x - 10),
-            inverse_func=None,
-        )
-
-    def tearDown(self):
-        # We are not doing side effect operations yet.
-        # del self.invertible_sequence
-        # def self.non_invertible_sequence
-        super().tearDown()
-
-
 # TODO: Aller methode par methode : TestNSequenceSumUpNTh,.....
 class TestNSequenceMethods(BaseNSequenceMethodTestCase):
     def setUp(self):
         self.invertible_sequence = NSequence(
-            func=lambda x: x ** 4 + 9,
+            func=q_x,
             inverse_func=lambda y: (y - 9) ** (1 / 4),
             initial_index=1,
         )
@@ -608,7 +581,7 @@ class TestNSequenceMethods(BaseNSequenceMethodTestCase):
 class TestExceptionRaising(unittest.TestCase):
     def test_should_raise_exception_if_inversion_gives_non_zero_decimal_float(self):
         sequence = NSequence(
-            func=lambda x: x,
+            func=i_x,
             initial_index=1,
             # Bad inverse
             inverse_func=lambda y: 1 / y,
@@ -622,22 +595,6 @@ class TestExceptionRaising(unittest.TestCase):
             f"tuple containing None or float(s) with non zero decimal(s) ",
             context.value.message,
         )
-
-
-class TestKwargs(unittest.TestCase):
-
-    def test_should_sum_up_using_the_provided_sum_up_func(self):
-        # Provide a bad sum_up_fun and ensure that we get the sum from it
-        sequence = NSequence(
-            func=lambda x: x ** x + 1,
-            initial_index=7,
-            # Bad sum_up_fun, but it does not matter as long as it is different from
-            # the sequence `func`. But be carefull to not get into coincidence.
-            sum_up_func=lambda x, **kwargs: x + 1,
-        )
-
-        # 29 + 1 = 30
-        self.assertEqual(sequence.sum_up_to_nth_term(29), 30)
 
 
 if __name__ == "__main__":

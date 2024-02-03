@@ -1,12 +1,7 @@
-identity = lambda x: x
-
-# Some functions
-_Fn = lambda x: x
-_In = lambda x: x
 
 
 def i_x(x):
-    """Identity function"""
+    """i_x function"""
     return x
 
 
