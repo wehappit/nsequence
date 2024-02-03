@@ -412,6 +412,28 @@ class TestIndexOfTermComputation(unittest.TestCase):
             0.25
         )
 
+
+class BaseNSequenceMethodTestCase(unittest.TestCase):
+    def setUp(self):
+        self.invertible_sequence = NSequence(
+            func=i_x ** 4 + 9,
+            inverse_func=lambda y: (y - 9) ** (1 / 4),
+            initial_index=1,
+        )
+        self.non_invertible_sequence = NSequence(
+            # The `func` provided here does not matter because for
+            # inversion, we just check if `inverse_fun` is callable
+            func=lambda x: abs(x - 10),
+            inverse_func=None,
+        )
+
+    def tearDown(self):
+        # We are not doing side effect operations yet.
+        # del self.invertible_sequence
+        # def self.non_invertible_sequence
+        super().tearDown()
+
+
 # TODO: Aller methode par methode : TestNSequenceSumUpNTh,.....
 class TestNSequenceMethods(BaseNSequenceMethodTestCase):
     def setUp(self):
