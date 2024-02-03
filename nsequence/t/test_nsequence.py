@@ -487,8 +487,7 @@ class TestCountTermsBetweenTermsComputation(unittest.TestCase):
             indexing_func=q_x,
         )
 
-
-        # l_x(q_x(1)) = 92 and q_x(1) = 13
+        # l_x(q_x(1)) = 92
         self.assertEqual(
             sequence1.count_terms_between_terms(92, 92),
             1
@@ -518,9 +517,78 @@ class TestCountTermsBetweenTermsComputation(unittest.TestCase):
 
 
 class TestCountTermsBetweenIndices(unittest.TestCase):
-    def test_should_count_terms_between_indices_if_no_indexing_inverse_func_provided(self):
-        pass
+    def test_should_count_terms_between_indices_if_no_indexing_func_provided(self):
+        sequence1 = NSequence(
+            func=l_x,
+        )
 
+        # When the two terms are the same and with the default initial_index
+        self.assertEqual(
+            sequence1.count_terms_between_indices(0, 0),
+            1
+        )
+
+        self.assertEqual(
+            sequence1.count_terms_between_indices(0, 92),
+            93
+        )
+
+        # Sequence with custom initial_index
+        sequence2 = NSequence(
+            func=l_x,
+            initial_index=4,
+        )
+
+        # When the two terms are the same
+        self.assertEqual(
+            sequence2.count_terms_between_indices(4, 4),
+            1
+        )
+
+        # Different term
+        self.assertEqual(
+            sequence2.count_terms_between_indices(4, 92),
+            89
+        )
+
+    def test_should_count_terms_between_indices_if_indexing_func_provided_and_no_indexing_inverse_func_provided(self):
+        """Ensure that we (kinda) brute-force to imitate the indexing_inverse_func behavior"""
+        sequence1 = NSequence(
+            func=l_x,
+            indexing_func=q_x,
+        )
+
+        # When the two terms are the same
+        self.assertEqual(
+            sequence1.count_terms_between_indices(10, 10),
+            1
+        )
+
+        self.assertEqual(
+            sequence1.count_terms_between_indices(10, 10009),
+            10
+        )
+    def test_should_count_terms_between_indices_if_indexing_func_provided_and_indexing_inverse_func_provided(self):
+        """Ensure `indexing_inverse_func` is used to do the computation"""
+
+        sequence1 = NSequence(
+            func=l_x,
+            indexing_func=q_x,
+            # We don't care about the effectiveness of the `indexing_inverse_func` here
+            # We just want to make sure that indexing_inverse_func is used to compute the count
+            indexing_inverse_func=i_x
+        )
+
+        # When the two terms are the same
+        self.assertEqual(
+            sequence1.count_terms_between_indices(10, 10),
+            1
+        )
+
+        self.assertEqual(
+            sequence1.count_terms_between_indices(10, 10009),
+            10
+        )
 class BaseNSequenceMethodTestCase(unittest.TestCase):
     def setUp(self):
         self.invertible_sequence = NSequence(

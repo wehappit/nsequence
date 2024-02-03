@@ -8,7 +8,7 @@ from math import ceil, floor
 # TODO: Doc about funcs monotony and continuity
 # TODO: Fix docstrings
 # TODO: Fix typing (some funcs should have float / int or float as return type
-
+# TODO: Don't let the user set indexing_func and initial_index car in such case initial_index = indexing_func(1)
 number = int | float
 
 
@@ -66,10 +66,15 @@ class NSequence(object):
         ]
 
         for _opt_func, _arity in _optional_funcs_entries:
-            self.__validate_func(
-                _opt_func,
-                expected_arity=_arity,
-            )
+            self.__validate_func(_opt_func, expected_arity=_arity)
+
+        # self.__validate_mutually_exclusive_params(
+        #    "When `indexing_func` is defined, `initial_index` becomes automatically "
+        #    "`indexing_func` image by the first position that is always 1. The intend "
+        #    "of this is to help you better to know what you're doing.",
+        #    initial_index=initial_index,
+        #    indexing_func=indexing_func,
+        # )
 
         # This function may hold the implementation of a recursive sequence.
         # In that case, the client could have added caching capability to the
@@ -215,6 +220,8 @@ class NSequence(object):
 
     def count_terms_between_indices(self, index1: int, index2: int):
         # The dev can override if the impl is not the one he wants
+        # The indexing function is supposed to be bijective
+        # The concept of position helps us do the computation
         index1_position = self.position_of_index(index1)
         index2_position = self.position_of_index(index2)
 
@@ -534,3 +541,19 @@ class NSequence(object):
             raise ArityMismatchError(
                 f"Function {getattr(func_to_validate, 'name', '')} expected {expected_arity} arguments but got {func_arity}"
             )
+
+    @staticmethod
+    def __validate_mutually_exclusive_params(msg: str, **kwargs):
+
+        not_none_kwargs = {}
+        for param, value in kwargs.items():
+            if value is None:
+                continue
+            if not_none_kwargs:
+                # We've already got a parameter set.
+                # TODO: improve exc name ?
+                raise ValueError(
+                    msg
+                )
+            not_none_kwargs[param] = value
+
