@@ -85,6 +85,7 @@ class NSequence(object):
         # The indexing function takes a position (of a term in the sequence) and gives
         # its index. Such function maps `{1, 2, 3,.., }` to the sequence indices set
 
+        # NOTE: `indexing_func` is supposed to be bijective
         if indexing_func:
             # If `indexing_func` is provided, we should
             # ignore the provided `initial_index` and use
@@ -178,6 +179,10 @@ class NSequence(object):
         return int(index)
 
     def count_terms_between_terms(self, term1: float, term2: float) -> int:
+        # We don't want to do this naively. Imagine when the function is injective
+        # and the user provide maybe the same term two times...
+        # This funcs makes more sens for bijective function
+
         """
         Counts the number of terms between two given terms in the sequence.
 
@@ -212,6 +217,8 @@ class NSequence(object):
         # The dev can override if the impl is not the one he wants
         index1_position = self.position_of_index(index1)
         index2_position = self.position_of_index(index2)
+
+        self.__validate_positions(index1_position, index2_position)
 
         return self.__count_positions_between(index1_position, index2_position)
 
@@ -473,7 +480,7 @@ class NSequence(object):
             cls.__validate_integers(*values_to_validate, min_value=1)
         except ValueError as exc:
             raise UnexpectedPositionError(
-                "Expect `positions` to be tuple of integers (only from 1), but actually "
+                "Expect `positions` to be tuple of integers (strictly greater than 0), but actually "
                 f"got a tuple of float(s) with non zero decimal(s) `{values_to_validate}`"
             ) from exc
 

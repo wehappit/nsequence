@@ -35,3 +35,4 @@ def s_x(x):
     """Sextique function"""
     # x(x−1)(x−2)(x−3)(x−4)(x-5)
     return x**6 - 10*(x**5) + 35*(x**4) - 50*(x**3) + 24*(x**2)
+

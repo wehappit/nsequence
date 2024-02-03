@@ -168,7 +168,7 @@ class TestSumUpToNthTermComputation(unittest.TestCase):
                 sequence.sum_up_to_nth_term(bad_param)
 
             self.assertIn(
-                "Expect `positions` to be tuple of integers (only from 1), but actually "
+                "Expect `positions` to be tuple of integers (strictly greater than 0), but actually "
                 "got a tuple of float(s) with non zero decimal(s) ",
                 context.value.message,
             )
@@ -341,6 +341,18 @@ class TestIndexOfTermComputation(unittest.TestCase):
             -2547
         )
 
+    def test_should_return_the_first_index_if_func_is_injective_and_naive_technic_is_activated(self):
+        sequence = NSequence(
+            # `s_x` is injective
+            func=s_x,
+            # The correctness of the `inverse_func` does not matter too much
+        )
+
+        self.assertEqual(
+            sequence.index_of_term(0, naive_technic=True),
+            0
+        )
+
     def test_should_compute_index_of_term_using_inverse_func_if_provided(self):
         sequence = NSequence(
             func=i_x,
@@ -412,6 +424,102 @@ class TestIndexOfTermComputation(unittest.TestCase):
             0.25
         )
 
+
+class TestCountTermsBetweenTermsComputation(unittest.TestCase):
+    def test_should_not_compute_count_terms_between_terms_if_no_inverse_func_provided(self):
+        sequence = NSequence(
+            func=i_x,
+        )
+
+        with pytest.raises(InversionError) as exc_info:
+            sequence.count_terms_between_terms(
+                5,
+                10
+            )
+
+        self.assertEqual(
+            exc_info.value.message,
+            "Cannot calculate `count_terms_between_indices_terms` for sequence "
+            "without `inverse_func`. It was not set.",
+        )
+
+    def test_should_compute_count_terms_between_terms_if_inverse_func_provided(self):
+        sequence1 = NSequence(
+            func=l_x,
+            inverse_func=lambda y: (y + 18) / 11
+        )
+
+        # When the two terms are the same and with the default initial_index
+        self.assertEqual(
+            sequence1.count_terms_between_terms(-18, -18),
+            1
+        )
+
+        # l_x(10) = 92
+        self.assertEqual(
+            sequence1.count_terms_between_terms(-18, 92),
+            11
+        )
+
+        sequence2 = NSequence(
+            func=l_x,
+            inverse_func=lambda y: (y + 18) / 11,
+            initial_index=3,
+        )
+
+        # When the two terms are the same and with the default initial_index
+        self.assertEqual(
+            sequence2.count_terms_between_terms(15, 15),
+            1
+        )
+
+        # l_x(10) = 92
+        self.assertEqual(
+            sequence2.count_terms_between_terms(15, 92),
+            8
+        )
+
+        # With indexing function provided
+
+        sequence3 = NSequence(
+            func=l_x,
+            inverse_func=lambda y: (y + 18) / 11,
+            indexing_func=q_x,
+        )
+
+
+        # l_x(q_x(1)) = 92 and q_x(1) = 13
+        self.assertEqual(
+            sequence1.count_terms_between_terms(92, 92),
+            1
+        )
+
+        # l_x(q_x(10)) = 110081
+        self.assertEqual(
+            sequence3.count_terms_between_terms(92, 110081),
+            10
+        )
+
+    def test_should_raise_exception_if_inverse_func_gives_decimal_bad_index_for_any_provided_term(self):
+        sequence1 = NSequence(
+            func=l_x,
+            inverse_func=lambda y: (y + 18) / 11
+        )
+
+        with pytest.raises(UnexpectedIndexError) as exc_info:
+            # Provide terms that will make the inverse_func returns decimals
+            sequence1.count_terms_between_terms(-0, -20)
+
+        self.assertIn(
+            f"Expect an `indices` to be a tuple of integers, but actually got a "
+            f"tuple containing None or float(s) with non zero decimal(s) ",
+            exc_info.value.message
+        )
+
+
+class TestCountTermsBetweenIndices(unittest.TestCase):
+    def test_should_count_terms_between_indices_if_no_indexing_inverse_func_provided(self):
+        pass
 
 class BaseNSequenceMethodTestCase(unittest.TestCase):
     def setUp(self):
