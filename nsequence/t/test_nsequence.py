@@ -6,7 +6,7 @@ from nsequence import (
     UnexpectedPositionError,
     InversionError,
 )
-from .utils import i_x, a_x, l_x, q_x, c_x, h_x, s_x
+from .test_utils import i_x, a_x, l_x, q_x, c_x, h_x, s_x
 
 
 # TODO: Test that the initial_index provided by the dev will be ignored if indexing_fun
