@@ -6,7 +6,7 @@ from nsequence import (
     UnexpectedPositionError,
     InversionError,
 )
-from .utils import i_x, a_x, l_x, q_x, c_x, h_x
+from .utils import i_x, a_x, l_x, q_x, c_x, h_x, s_x
 
 identity = lambda x: x
 
@@ -60,7 +60,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
         )
 
     def test_should_not_instantiate_nsequence_if_any_bad_object_provided_as_function(
-        self,
+            self,
     ):
         with pytest.raises(TypeError) as context:
             NSequence(
@@ -252,26 +252,176 @@ class TestSumUpToNthTermComputation(unittest.TestCase):
 
 class TestIndexOfTermComputation(unittest.TestCase):
     # to be continued
-    def test_should_fail_if_no_inverse_func_provided(self):
+    def test_should_fail_if_no_inverse_func_provided_and_naive_technic_is_not_activated(self):
         sequence = NSequence(
             func=a_x,
         )
 
         with pytest.raises(InversionError) as exc_info:
             # The provided term as arg does not matter here
-            sequence.index_of_term(3, naive_technic=False)
+            sequence.index_of_term(3)
             self.assertEqual(
                 "Cannot calculate `index_of_term` for sequence without `inverse_func` and with "
-                "`naive_technic=False` set. You need either to provide `inverse_func` or set "
+                "`naive_technic` set to `False`. You need either to provide `inverse_func` or set "
                 "`naive_technic` to `True`",
                 exc_info.value.message,
             )
+
+    def test_should_naively_compute_term_index_if_no_inverse_func_and_naive_technic_is_activated(self):
+        sequence1 = NSequence(
+            func=q_x,
+        )
+
+        # Ensure the result is correct for the first term.
+        # The default `initial_index` is 0 and the first term is 9
+        self.assertEqual(
+            sequence1.index_of_term(9, naive_technic=True),
+            0
+        )
+
+        # q_x(8) = 4105
+        self.assertEqual(
+            sequence1.index_of_term(4105, naive_technic=True),
+            8
+        )
+
+        # Ensure we get correct results if `initial_index` was set
+
+        sequence2 = NSequence(
+            func=q_x,
+            initial_index=10
+        )
+
+        # Ensure the result is correct for the first term.
+        # q_x(10) = 10009
+        self.assertEqual(
+            sequence2.index_of_term(10009, naive_technic=True),
+            10
+        )
+
+        # q_x(14) = 38425
+        self.assertEqual(
+            sequence2.index_of_term(38425, naive_technic=True),
+            14
+        )
+
+        sequence3 = NSequence(
+            func=q_x,
+            indexing_func=c_x,
+        )
+
+        # Ensure the result is correct for the first term.
+        # q_x(c_x(1)) = 10 and c_x(1) = -1
+        self.assertEqual(
+            sequence3.index_of_term(10, naive_technic=True),
+            -1
+        )
+
+        # q_x(c_x(14)) = 42083880609690 and c_x(14) = 2547
+        self.assertEqual(
+            sequence3.index_of_term(42083880609690, naive_technic=True),
+            2547
+        )
+
+        # Sequence having descending indexing function
+
+        sequence4 = NSequence(
+            func=q_x,
+            indexing_func=lambda x: -c_x(x),
+        )
+
+        # Ensure the result is correct for the first term.
+        # q_x(-c_x(1)) = 10 and -c_x(1) = 1
+        self.assertEqual(
+            sequence4.index_of_term(10, naive_technic=True),
+            1
+        )
+
+        # q_x(-c_x(14)) = 42083880609690 and -c_x(14) = -2547
+        self.assertEqual(
+            sequence4.index_of_term(42083880609690, naive_technic=True),
+            -2547
+        )
+
+    def test_should_compute_index_of_term_using_inverse_func_if_provided(self):
+        sequence = NSequence(
+            func=i_x,
+            # The correctness of the `inverse_func` does not matter too much
+            inverse_func=q_x,
+        )
+
+        self.assertEqual(
+            sequence.index_of_term(4),
+            # q_x(4) = 265
+            265
+        )
+
+    def test_should_compute_index_of_term_using_inverse_func_if_provided_and_ignore_naive_technic_param(self):
+        sequence = NSequence(
+            func=i_x,
+            # The correctness of the `inverse_func` does not matter too much
+            inverse_func=q_x,
+        )
+
+        self.assertEqual(
+            sequence.index_of_term(4, naive_technic=True),
+            # q_x(4) = 265
+            265
+        )
+
+    def test_should_raise_indexing_exception_found_index_is_not_integer(self):
+        pass
+
+    def test_should_not_raise_indexing_exception_if_param_is_not_activated(self):
+        sequence = NSequence(
+            func=i_x,
+            # The correctness of the `inverse_func` does not matter too much
+            inverse_func=h_x,
+        )
+
+        self.assertEqual(
+            sequence.index_of_term(4, exact_exception=False),
+            0.25
+        )
+
+    def test_should_not_raise_indexing_exception_if_param_is_activated(self):
+        sequence = NSequence(
+            func=i_x,
+            # The correctness of the `inverse_func` does not matter too much
+            inverse_func=h_x,
+        )
+
+        with pytest.raises(UnexpectedIndexError) as exc_info:
+            self.assertEqual(
+                sequence.index_of_term(4, exact_exception=True),
+                0.25
+            )
+
+        self.assertIn(
+            f"Expect an `indices` to be a tuple of integers, but actually got a "
+            f"tuple containing None or float(s) with non zero decimal(s) ",
+            exc_info.value.message
+        )
+
+    def test_should_not_compute_index_of_term_using_indexing_func_if_inverse_func_provided(self):
+        sequence = NSequence(
+            func=i_x,
+            indexing_func=q_x,
+            # The correctness of the `inverse_func` does not matter too much
+            # but should just be chosen to avoid coincidences
+            inverse_func=h_x,
+        )
+
+        self.assertEqual(
+            sequence.index_of_term(4, exact_exception=False),
+            0.25
+        )
 
 
 class BaseNSequenceMethodTestCase(unittest.TestCase):
     def setUp(self):
         self.invertible_sequence = NSequence(
-            func=lambda x: x**4 + 9,
+            func=lambda x: x ** 4 + 9,
             inverse_func=lambda y: (y - 9) ** (1 / 4),
             initial_index=1,
         )
@@ -293,7 +443,7 @@ class BaseNSequenceMethodTestCase(unittest.TestCase):
 class TestNSequenceMethods(BaseNSequenceMethodTestCase):
     def setUp(self):
         self.invertible_sequence = NSequence(
-            func=lambda x: x**4 + 9,
+            func=lambda x: x ** 4 + 9,
             inverse_func=lambda y: (y - 9) ** (1 / 4),
             initial_index=1,
         )
@@ -449,7 +599,7 @@ class TestNSequenceMethods(BaseNSequenceMethodTestCase):
         self.assertFalse(self.non_invertible_sequence.is_invertible)
 
     def test__initial_term(self):
-        self.assertEqual(self.invertible_sequence.initial_term, 1**2 + 9)
+        self.assertEqual(self.invertible_sequence.initial_term, 1 ** 2 + 9)
 
     def test__initial_index(self):
         self.assertEqual(self.invertible_sequence.initial_index, 1)
@@ -468,8 +618,8 @@ class TestExceptionRaising(unittest.TestCase):
             sequence.count_terms_between_terms(3, 4)
 
         self.assertIn(
-            "Expect an `indices` to be a tuple of integers, but actually got a "
-            "tuple of float(s) with non zero decimal(s) ",
+            f"Expect an `indices` to be a tuple of integers, but actually got a "
+            f"tuple containing None or float(s) with non zero decimal(s) ",
             context.value.message,
         )
 
@@ -479,7 +629,7 @@ class TestKwargs(unittest.TestCase):
     def test_should_sum_up_using_the_provided_sum_up_func(self):
         # Provide a bad sum_up_fun and ensure that we get the sum from it
         sequence = NSequence(
-            func=lambda x: x**x + 1,
+            func=lambda x: x ** x + 1,
             initial_index=7,
             # Bad sum_up_fun, but it does not matter as long as it is different from
             # the sequence `func`. But be carefull to not get into coincidence.
