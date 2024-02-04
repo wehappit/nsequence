@@ -1,5 +1,5 @@
 def i_x(x):
-    """i_x function"""
+    """Identity function"""
     return x
 
 
