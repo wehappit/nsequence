@@ -1,15 +1,18 @@
 import functools
 import inspect
-import sys
+import logging
 from typing import Callable, Any
 
 from math import ceil, floor
+
 
 # TODO: Doc about funcs monotony and continuity
 # TODO: Fix docstrings
 # TODO: Fix typing (some funcs should have float / int or float as return type
 # TODO: Don't let the user set indexing_func and initial_index car in such case initial_index = indexing_func(1)
 number = int | float
+
+logger = logging.getLogger(__name__)
 
 
 class ArityMismatchError(Exception):
@@ -44,6 +47,7 @@ class IndexNotFoundError(Exception):
 
 class NSequence(object):
     POSITION_LIMIT = 1_000_000
+    DEFAULT_INITIAL_INDEX = 0
 
     def __init__(
         self,
@@ -52,7 +56,7 @@ class NSequence(object):
         inverse_func: Callable[[number], number] = None,
         indexing_func: Callable[[int], int] = None,
         indexing_inverse_func: Callable[[number], number] = None,
-        initial_index=0,
+        initial_index=None,
     ) -> None:
         super().__init__()
 
@@ -69,11 +73,11 @@ class NSequence(object):
             self.__validate_func(_opt_func, expected_arity=_arity)
 
         self.__validate_mutually_exclusive_params(
-           "When `indexing_func` is defined, `initial_index` becomes automatically "
-           "`indexing_func` image by the first position that is always 1. The intend "
-           "of this is to help you better to be aware of what you're doing.",
-           initial_index=initial_index,
-           indexing_func=indexing_func,
+            "When `indexing_func` is defined, `initial_index` becomes automatically "
+            "`indexing_func` image by the first position that is always 1. The intend "
+            "of this is to help you better to be aware of what you're doing.",
+            initial_index=initial_index,
+            indexing_func=indexing_func,
         )
 
         # This function may hold the implementation of a recursive sequence.
@@ -84,8 +88,6 @@ class NSequence(object):
         # The supposed inverse of `self._func`
         self._inverse_func = inverse_func
         self._indexing_inverse_func = indexing_inverse_func
-        # The starting index of the sequence
-        self._initial_index = initial_index
 
         # The indexing function takes a position (of a term in the sequence) and gives
         # its index. Such function maps `{1, 2, 3,.., }` to the sequence indices set
@@ -101,6 +103,8 @@ class NSequence(object):
             # Use the default indexing func and its inverse
             self._indexing_func = lambda position: self._initial_index + position - 1
             self._indexing_inverse_func = lambda index: index - self._initial_index + 1
+            # The starting index of the sequence
+            self._initial_index = initial_index or self.DEFAULT_INITIAL_INDEX
 
     def nth_term(self, n: int) -> number:
         """Computes the nth term of the sequence"""
@@ -554,7 +558,5 @@ class NSequence(object):
         for param, value in kwargs.items():
             if value is None:
                 continue
-
-            assert not_none_kwargs, msg
-
+            logger.warning(msg)
             not_none_kwargs[param] = value
