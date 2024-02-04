@@ -317,6 +317,7 @@ class NSequence(object):
         iter_limit=1000,
         prefer_left_term=True,
     ):
+        # Continuity and monotony problem
         """
         `iter_limit` and `starting_position` are ignored if `inversion_technic` is `True`.
 
@@ -385,9 +386,9 @@ class NSequence(object):
         """Gets the initial term of the sequence."""
         return self._func(self._initial_index)
 
-    def __create_sequence_pairs_generator(self, terms_limit=1000, starting_position=1):
+    def __create_sequence_pairs_generator(self, iter_limit=1000, starting_position=1):
         # https://stackoverflow.com/questions/1995418/python-generator-expression-vs-yield
-        for position in range(starting_position, starting_position + terms_limit):
+        for position in range(starting_position, starting_position + iter_limit):
             # Index of the position .i.e the `position_th` index
             position_index = self._indexing_func(position)
             yield position_index, self._func(position_index)
@@ -405,6 +406,10 @@ class NSequence(object):
         lazy_generated_pairs = self.__create_sequence_pairs_generator(
             iter_limit=iter_limit, starting_position=starting_position
         )
+
+        min_distance = float("inf")
+        nearest_term_index, nearest_term = None, None
+
         for index, term in lazy_generated_pairs:
             distance = abs(term - term_neighbor)
             if (distance == min_distance and not prefer_left_term) or (

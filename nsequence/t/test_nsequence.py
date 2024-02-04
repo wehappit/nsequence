@@ -9,9 +9,6 @@ from nsequence import (
 from .test_utils import i_x, a_x, l_x, q_x, c_x, h_x, s_x
 
 
-# TODO: Test that the initial_index provided by the dev will be ignored if indexing_fun
-
-
 class TestNSequenceInstantiation(unittest.TestCase):
 
     def test_should_instantiate_nsequence_with_minimal_params(self):
@@ -632,82 +629,44 @@ class TestTermsBetweenIndicesComputation(unittest.TestCase):
         )
 
 
-class BaseNSequenceMethodTestCase(unittest.TestCase):
-    def setUp(self):
-        self.invertible_sequence = NSequence(
-            func=i_x**4 + 9,
-            inverse_func=lambda y: (y - 9) ** (1 / 4),
-            initial_index=1,
-        )
-        self.non_invertible_sequence = NSequence(
-            # The `func` provided here does not matter because for
-            # inversion, we just check if `inverse_fun` is callable
-            func=lambda x: abs(x - 10),
-            inverse_func=None,
-        )
-
-    def tearDown(self):
-        # We are not doing side effect operations yet.
-        # del self.invertible_sequence
-        # def self.non_invertible_sequence
-        super().tearDown()
-
-
-# TODO: Aller methode par methode : TestNSequenceSumUpNTh,.....
-class TestNSequenceMethods(BaseNSequenceMethodTestCase):
-
-    def test__nearest_term_position(self):
-        # 2**4 + 9 = 25
-        # 3**4 + 9 = 90
-        # 29**4 + 9 = 707290
-        # 30**4 + 9 = 810009
-
-        self.assertEqual(
-            self.invertible_sequence.nearest_term_position(707290 + 10), 29
-        )
-
-        # Test with a term that's exactly in the sequence
-        self.assertEqual(self.invertible_sequence.nearest_term_position(25), 2)
-
-        # Test prefer_left_term param
-        self.assertEqual(
-            self.invertible_sequence.nearest_term_position(
-                (25 + 90) / 2, prefer_left_term=True
-            ),
-            2,
-        )
-        self.assertEqual(
-            self.invertible_sequence.nearest_term_position(
-                (25 + 90) / 2, prefer_left_term=False
-            ),
-            3,
-        )
-
-    def test__nearest_term(self):
-        # 2**4 + 9
-        # 29**4 + 9 = 707290
-        # 30**4 + 9 = 810009
-
-        self.assertEqual(self.invertible_sequence.nearest_term(707290 + 10), 707290)
-
-        # Test with a term that's exactly in the sequence
-        self.assertEqual(self.invertible_sequence.nearest_term(25), 25)
-
-    def test__is_invertible(self):
-        self.assertTrue(self.invertible_sequence.is_invertible)
-        self.assertFalse(self.non_invertible_sequence.is_invertible)
-
-    def test__initial_term(self):
-        self.assertEqual(self.invertible_sequence.initial_term, 1**2 + 9)
-
-    def test__initial_index(self):
-        self.assertEqual(self.invertible_sequence.initial_index, 1)
-
-
 class TestNearestEntryComputation(unittest.TestCase):
-    def test_should_compute_nearest_entry_naively(self):
+    def test_should_compute_nearest_entry_naively_if_param_activated(self):
+        sequence = NSequence(
+            func=q_x,
+        )
 
-        pass
+        # When the term is one entry of the sequence (the default `initial_index`)
+        self.assertEqual(sequence.nearest_entry(25, inversion_technic=False), (2, 25))
+
+        # When the term is not an entry of the sequence
+        self.assertEqual(sequence.nearest_entry(30, inversion_technic=False), (2, 25))
+
+    def test_should_compute_nearest_entry_inversely_if_param_activated(self):
+        sequence = NSequence(
+            func=q_x,
+            # Here, the effectiveness of the inverse_func does not matter
+            inverse_func=i_x,
+        )
+
+        # When the term is a term of the sequence
+        self.assertEqual(sequence.nearest_entry(25), (25, 25))
+
+        self.assertEqual(sequence.nearest_entry(25.54), (25, 390634))
+
+
+class TestNSequenceProperties(unittest.TestCase):
+
+    def test_initial_term(self):
+        self.assertEqual(NSequence(func=s_x).initial_term, 0)
+        self.assertEqual(NSequence(func=l_x, initial_index=4).initial_term, 26)
+
+    def test_initial_index(self):
+        self.assertEqual(NSequence(func=s_x, initial_index=50).initial_index, 50)
+
+        # When indexing func provided, initial_index is ignored
+        self.assertEqual(
+            NSequence(func=i_x, indexing_func=q_x, initial_index=400).initial_index, 10
+        )
 
 
 if __name__ == "__main__":
