@@ -1,12 +1,15 @@
 import unittest
 import pytest
-from nsequence import (
-    NSequence,
+
+
+from ..nsequence.nsequence import NSequence
+from ..nsequence.exceptions import (
     ArityMismatchError,
-    UnexpectedIndexError,
-    UnexpectedPositionError,
-    InversionError,
-)
+    UnexpectedIndexError, 
+    UnexpectedPositionError, 
+    InversionError, 
+    # IndexNotFoundError,
+) 
 
 
 identity_x = lambda x: x

@@ -4,41 +4,17 @@ import inspect
 from typing import Callable, Any
 from math import ceil, floor
 
+from .exceptions import (
+    ArityMismatchError,
+    UnexpectedIndexError, 
+    UnexpectedPositionError, 
+    InversionError, 
+    IndexNotFoundError
+)
 # TODO: Doc about funcs monotony and continuity
-# TODO: Fix docstrings
 # TODO: Fix typing (some funcs should have float / int or float as return type
-# TODO: Don't let the user set indexing_func and initial_index car in such case initial_index = indexing_func(1)
 number = int | float
 
-
-class ArityMismatchError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
-        self.message = message
-
-
-class UnexpectedPositionError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
-        self.message = message
-
-
-class UnexpectedIndexError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
-        self.message = message
-
-
-class InversionError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
-        self.message = message
-
-
-class IndexNotFoundError(Exception):
-    def __init__(self, message):
-        super().__init__(message)
-        self.message = message
 
 
 class NSequence(object):
