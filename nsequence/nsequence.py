@@ -548,7 +548,7 @@ class NSequence(object):
 
         if func_arity != expected_arity:
             raise ArityMismatchError(
-                f"Function {getattr(func_to_validate, 'name', '')} expected {expected_arity} arguments but got {func_arity}"
+                f"Function {getattr(func_to_validate, '__name__', '')} expected {expected_arity} argument(s) but got {func_arity}"
             )
 
     @staticmethod

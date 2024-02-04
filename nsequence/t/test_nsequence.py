@@ -5,8 +5,9 @@ from nsequence import (
     UnexpectedIndexError,
     UnexpectedPositionError,
     InversionError,
+    ArityMismatchError,
 )
-from .test_utils import i_x, a_x, l_x, q_x, c_x, h_x, s_x
+from .test_utils import i_x, a_x, l_x, q_x, c_x, h_x, s_x, b_x
 
 
 class TestNSequenceInstantiation(unittest.TestCase):
@@ -53,6 +54,25 @@ class TestNSequenceInstantiation(unittest.TestCase):
             "NSequence.__init__() missing 1 required keyword-only argument: 'func'",
             context.value.args[0],
         )
+
+
+    def test_should_not_instantiate_nsequence_if_any_bad_object_provided_as_function(
+        self,
+    ):
+
+        with pytest.raises(ArityMismatchError) as context:
+            NSequence(
+                #
+                func=b_x,
+                initial_index=1,
+                # Bad inverse
+                inverse_func="bad object as func",
+            )
+
+        self.assertTrue(
+            "Function b_x expected 1 argument(s), but got 3", context.value.args[0]
+        )
+
 
     def test_should_not_instantiate_nsequence_if_any_bad_object_provided_as_function(
         self,
@@ -652,6 +672,8 @@ class TestNearestEntryComputation(unittest.TestCase):
         self.assertEqual(sequence.nearest_entry(25), (25, 25))
 
         self.assertEqual(sequence.nearest_entry(25.54), (25, 390634))
+
+    # TODO: Tests for extra params
 
 
 class TestNSequenceProperties(unittest.TestCase):
