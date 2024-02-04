@@ -8,7 +8,7 @@ from math import ceil, floor
 # TODO: Doc about funcs monotony and continuity
 # TODO: Fix docstrings
 # TODO: Fix typing (some funcs should have float / int or float as return type
-
+# TODO: Don't let the user set indexing_func and initial_index car in such case initial_index = indexing_func(1)
 number = int | float
 
 
@@ -46,13 +46,13 @@ class NSequence(object):
     POSITION_LIMIT = 1_000_000
 
     def __init__(
-            self,
-            *,
-            func: Callable[[int], number],
-            inverse_func: Callable[[number], number] = None,
-            indexing_func: Callable[[int], int] = None,
-            indexing_inverse_func: Callable[[number], number] = None,
-            initial_index=0,
+        self,
+        *,
+        func: Callable[[int], number],
+        inverse_func: Callable[[number], number] = None,
+        indexing_func: Callable[[int], int] = None,
+        indexing_inverse_func: Callable[[number], number] = None,
+        initial_index=0,
     ) -> None:
         super().__init__()
 
@@ -66,10 +66,15 @@ class NSequence(object):
         ]
 
         for _opt_func, _arity in _optional_funcs_entries:
-            self.__validate_func(
-                _opt_func,
-                expected_arity=_arity,
-            )
+            self.__validate_func(_opt_func, expected_arity=_arity)
+
+        # self.__validate_mutually_exclusive_params(
+        #    "When `indexing_func` is defined, `initial_index` becomes automatically "
+        #    "`indexing_func` image by the first position that is always 1. The intend "
+        #    "of this is to help you better to know what you're doing.",
+        #    initial_index=initial_index,
+        #    indexing_func=indexing_func,
+        # )
 
         # This function may hold the implementation of a recursive sequence.
         # In that case, the client could have added caching capability to the
@@ -85,6 +90,7 @@ class NSequence(object):
         # The indexing function takes a position (of a term in the sequence) and gives
         # its index. Such function maps `{1, 2, 3,.., }` to the sequence indices set
 
+        # NOTE: `indexing_func` is supposed to be bijective
         if indexing_func:
             # If `indexing_func` is provided, we should
             # ignore the provided `initial_index` and use
@@ -121,7 +127,7 @@ class NSequence(object):
 
     @functools.lru_cache(maxsize=128)
     def index_of_term(
-            self, term: float, naive_technic=False, exact_exception=True
+        self, term: float, naive_technic=False, exact_exception=True
     ) -> int:
         # DOCME: naive_technic is ignored if the sequence inversion func is provided
         """
@@ -178,6 +184,10 @@ class NSequence(object):
         return int(index)
 
     def count_terms_between_terms(self, term1: float, term2: float) -> int:
+        # We don't want to do this naively. Imagine when the function is injective
+        # and the user provide maybe the same term two times...
+        # This funcs makes more sens for bijective function
+
         """
         Counts the number of terms between two given terms in the sequence.
 
@@ -210,8 +220,12 @@ class NSequence(object):
 
     def count_terms_between_indices(self, index1: int, index2: int):
         # The dev can override if the impl is not the one he wants
+        # The indexing function is supposed to be bijective
+        # The concept of position helps us do the computation
         index1_position = self.position_of_index(index1)
         index2_position = self.position_of_index(index2)
+
+        self.__validate_positions(index1_position, index2_position)
 
         return self.__count_positions_between(index1_position, index2_position)
 
@@ -229,9 +243,9 @@ class NSequence(object):
         # Raise an exception if any index is not integer
         self.__validate_indices(term1_index, term2_index)
 
-        return self.terms_between(int(term1_index), int(term2_index))
+        return self.terms_between_indices(int(term1_index), int(term2_index))
 
-    def terms_between(self, index1: int, index2: int):
+    def terms_between_indices(self, index1: int, index2: int):
 
         index1 = min(index1, index2)
         index2 = max(index1, index2)
@@ -240,17 +254,17 @@ class NSequence(object):
         index2_position = self.position_of_index(index2)
 
         return [
-            self._func(self._indexing_func(position))
+            self.nth_term(position)
             for position in range(index1_position, index2_position + 1)
         ]
 
     def nearest_term_index(
-            self,
-            term_neighbor: float,
-            inversion_technic=True,
-            starting_position=1,
-            iter_limit=1000,
-            prefer_left_term=True,
+        self,
+        term_neighbor: float,
+        inversion_technic=True,
+        starting_position=1,
+        iter_limit=1000,
+        prefer_left_term=True,
     ):
         """
         Finds the index of the nearest term in the sequence to a given term.
@@ -276,12 +290,12 @@ class NSequence(object):
         return nearest_term_index
 
     def nearest_term(
-            self,
-            term_neighbor: float,
-            inversion_technic=True,
-            starting_position=1,
-            iter_limit=1000,
-            prefer_left_term=True,
+        self,
+        term_neighbor: float,
+        inversion_technic=True,
+        starting_position=1,
+        iter_limit=1000,
+        prefer_left_term=True,
     ) -> number:
         """Gets the nearest term in the sequence to the given `term_neighbor`."""
 
@@ -296,13 +310,14 @@ class NSequence(object):
         return nearest_term
 
     def nearest_entry(
-            self,
-            term_neighbor: float,
-            inversion_technic=bool,
-            starting_position=1,
-            iter_limit=1000,
-            prefer_left_term=True,
+        self,
+        term_neighbor: float,
+        inversion_technic=bool,
+        starting_position=1,
+        iter_limit=1000,
+        prefer_left_term=True,
     ):
+        # Continuity and monotony problem
         """
         `iter_limit` and `starting_position` are ignored if `inversion_technic` is `True`.
 
@@ -371,30 +386,34 @@ class NSequence(object):
         """Gets the initial term of the sequence."""
         return self._func(self._initial_index)
 
-    def __create_sequence_pairs_generator(self, terms_limit=1000, starting_position=1):
+    def __create_sequence_pairs_generator(self, iter_limit=1000, starting_position=1):
         # https://stackoverflow.com/questions/1995418/python-generator-expression-vs-yield
-        for position in range(starting_position, starting_position + terms_limit):
+        for position in range(starting_position, starting_position + iter_limit):
             # Index of the position .i.e the `position_th` index
             position_index = self._indexing_func(position)
             yield position_index, self._func(position_index)
 
     @functools.lru_cache(maxsize=128)
     def __naively_get_sequence_nearest_entry(
-            self,
-            term_neighbor: float,
-            starting_position=1,
-            iter_limit=1000,
-            prefer_left_term=True,
+        self,
+        term_neighbor: float,
+        starting_position=1,
+        iter_limit=1000,
+        prefer_left_term=True,
     ):
         # You have another idea ? Let's discuss it
 
         lazy_generated_pairs = self.__create_sequence_pairs_generator(
             iter_limit=iter_limit, starting_position=starting_position
         )
+
+        min_distance = float("inf")
+        nearest_term_index, nearest_term = None, None
+
         for index, term in lazy_generated_pairs:
             distance = abs(term - term_neighbor)
             if (distance == min_distance and not prefer_left_term) or (
-                    distance < min_distance
+                distance < min_distance
             ):
                 min_distance = distance
                 nearest_term_index = index
@@ -405,9 +424,9 @@ class NSequence(object):
 
     @functools.lru_cache(maxsize=128)
     def __inversely_get_sequence_nearest_entry(
-            self,
-            term_neighbor: float,
-            prefer_left_term=True,
+        self,
+        term_neighbor: float,
+        prefer_left_term=True,
     ) -> tuple[int, number]:
         # Here the index of `term_neighbor` can be floated because it
         # may not be one of the sequence's terms.
@@ -416,7 +435,7 @@ class NSequence(object):
 
         # If position is integer then index should too
         if self.__is_integer(term_neighbor_position) and not self.__is_integer(
-                term_neighbor_index
+            term_neighbor_index
         ):
             raise UnexpectedIndexError(
                 f"Expect index of position {term_neighbor_position} to be an integer, "
@@ -424,11 +443,11 @@ class NSequence(object):
             )
 
         if all(
-                self.__is_integer(val)
-                for val in (
-                        term_neighbor_position,
-                        term_neighbor_index,
-                )
+            self.__is_integer(val)
+            for val in (
+                term_neighbor_position,
+                term_neighbor_index,
+            )
         ):
             # The provided term is a term of the sequence so do nothing
             return term_neighbor_index, term_neighbor
@@ -443,8 +462,8 @@ class NSequence(object):
         right_distance_to_neighbor = abs(term_neighbor - right_nearest_term)
 
         if (
-                not prefer_left_term
-                and left_distance_to_neighbor == right_distance_to_neighbor
+            not prefer_left_term
+            and left_distance_to_neighbor == right_distance_to_neighbor
         ):
             nearest_term_position = right_nearest_term_position
         elif left_distance_to_neighbor > right_distance_to_neighbor:
@@ -473,7 +492,7 @@ class NSequence(object):
             cls.__validate_integers(*values_to_validate, min_value=1)
         except ValueError as exc:
             raise UnexpectedPositionError(
-                "Expect `positions` to be tuple of integers (only from 1), but actually "
+                "Expect `positions` to be tuple of integers (strictly greater than 0), but actually "
                 f"got a tuple of float(s) with non zero decimal(s) `{values_to_validate}`"
             ) from exc
 
@@ -506,7 +525,7 @@ class NSequence(object):
 
     @staticmethod
     def __validate_func(
-            func_to_validate: Any, expected_arity: int = 0, is_optional=True
+        func_to_validate: Any, expected_arity: int = 0, is_optional=True
     ):
         """
         Ensure that `func_to_validate` is a function and has the correct number of
@@ -527,3 +546,16 @@ class NSequence(object):
             raise ArityMismatchError(
                 f"Function {getattr(func_to_validate, 'name', '')} expected {expected_arity} arguments but got {func_arity}"
             )
+
+    @staticmethod
+    def __validate_mutually_exclusive_params(msg: str, **kwargs):
+
+        not_none_kwargs = {}
+        for param, value in kwargs.items():
+            if value is None:
+                continue
+            if not_none_kwargs:
+                # We've already got a parameter set.
+                # TODO: improve exc name ?
+                raise ValueError(msg)
+            not_none_kwargs[param] = value
