@@ -83,7 +83,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
             )
 
         self.assertTrue(
-            "Function b_x expected 1 argument(s), but got 3", context.value.args[0]
+            "Function f_xyz expected 1 argument(s), but got 3", context.value.args[0]
         )
 
 
@@ -328,10 +328,10 @@ class TestIndexOfTermComputation(unittest.TestCase):
         )
 
         # Ensure the result is correct for the first term.
-        # quartic_x(c_x(1)) = 10 and c_x(1) = -1
+        # quartic_x(cubic_x(1)) = 10 and cubic_x(1) = -1
         self.assertEqual(sequence3.index_of_term(10, naive_technic=True), -1)
 
-        # quartic_x(c_x(14)) = 42083880609690 and c_x(14) = 2547
+        # quartic_x(cubic_x(14)) = 42083880609690 and cubic_x(14) = 2547
         self.assertEqual(
             sequence3.index_of_term(42083880609690, naive_technic=True), 2547
         )
@@ -340,14 +340,14 @@ class TestIndexOfTermComputation(unittest.TestCase):
 
         sequence4 = NSequence(
             func=quartic_x,
-            indexing_func=lambda x: -c_x(x),
+            indexing_func=lambda x: -cubic_x(x),
         )
 
         # Ensure the result is correct for the first term.
-        # quartic_x(-c_x(1)) = 10 and -c_x(1) = 1
+        # quartic_x(-cubic_x(1)) = 10 and -cubic_x(1) = 1
         self.assertEqual(sequence4.index_of_term(10, naive_technic=True), 1)
 
-        # quartic_x(-c_x(14)) = 42083880609690 and -c_x(14) = -2547
+        # quartic_x(-cubic_x(14)) = 42083880609690 and -cubic_x(14) = -2547
         self.assertEqual(
             sequence4.index_of_term(42083880609690, naive_technic=True), -2547
         )
@@ -409,8 +409,8 @@ class TestIndexOfTermComputation(unittest.TestCase):
             self.assertEqual(sequence.index_of_term(4, exact_exception=True), 0.25)
 
         self.assertIn(
-            f"Expect an `indices` to be a tuple of integers, but actually got a "
-            f"tuple containing None or float(s) with non zero decimal(s) ",
+            "Expect an `indices` to be a tuple of integers, but actually got a "
+            "tuple containing None or float(s) with non zero decimal(s) ",
             exc_info.value.message,
         )
 
@@ -490,8 +490,8 @@ class TestCountTermsBetweenTermsComputation(unittest.TestCase):
             sequence1.count_terms_between_terms(-0, -20)
 
         self.assertIn(
-            f"Expect an `indices` to be a tuple of integers, but actually got a "
-            f"tuple containing None or float(s) with non zero decimal(s) ",
+            "Expect an `indices` to be a tuple of integers, but actually got a "
+            "tuple containing None or float(s) with non zero decimal(s) ",
             exc_info.value.message,
         )
 
@@ -507,8 +507,8 @@ class TestCountTermsBetweenTermsComputation(unittest.TestCase):
             sequence.count_terms_between_terms(3, 4)
 
         self.assertIn(
-            f"Expect an `indices` to be a tuple of integers, but actually got a "
-            f"tuple containing None or float(s) with non zero decimal(s) ",
+            "Expect an `indices` to be a tuple of integers, but actually got a "
+            "tuple containing None or float(s) with non zero decimal(s) ",
             context.value.message,
         )
 
@@ -559,7 +559,7 @@ class TestCountTermsBetweenIndices(unittest.TestCase):
             func=linear_x,
             indexing_func=quartic_x,
             # We don't care about the effectiveness of the `indexing_inverse_func` here
-            # We just want to make sure that indexing_inverse_func is used to compute the count
+            # We just want to make sure that `indexing_inverse_func` is used to compute the count
             indexing_inverse_func=identity_x,
         )
 
@@ -573,7 +573,7 @@ class TestCountTermsBetweenIndices(unittest.TestCase):
             func=linear_x,
             indexing_func=quartic_x,
             # We don't care about the effectiveness of the `indexing_inverse_func` here
-            # We just want to make sure that indexing_inverse_func is used to compute the count
+            # We just want to make sure that `indexing_inverse_func` is used to compute the count
             indexing_inverse_func=harmonic_x,
         )
 
@@ -583,7 +583,7 @@ class TestCountTermsBetweenIndices(unittest.TestCase):
             self.assertEqual(sequence1.count_terms_between_indices(10, 10), 1)
         self.assertIn(
             "Expect `positions` to be tuple of integers (strictly greater than 0), but actually "
-            f"got a tuple of float(s) with non zero decimal(s) `",
+            "got a tuple of float(s) with non zero decimal(s) `",
             exc_info.value.args[0],
         )
 
