@@ -2,12 +2,21 @@ import unittest
 import pytest
 from nsequence import (
     NSequence,
+    ArityMismatchError,
     UnexpectedIndexError,
     UnexpectedPositionError,
     InversionError,
-    ArityMismatchError,
 )
-from .test_utils import i_x, a_x, l_x, q_x, c_x, h_x, s_x, b_x
+
+
+identity_x = lambda x: x
+linear_x = lambda x: 11 * x - 18
+quartic_x = lambda x: x ** 4 + 9
+absolute_x = lambda x: abs(x - 20)
+cubic_x = lambda x: x ** 3 - x ** 2 - 1
+harmonic_x = lambda x: 1 / x
+# Used when injective function is needed x(x−1)(x−2)(x−3)(x−4)(x-5)
+sextique_x = lambda x: x ** 6 - 10 * (x ** 5) + 35 * (x ** 4) - 50 * (x ** 3) + 24 * (x ** 2)
 
 
 class TestNSequenceInstantiation(unittest.TestCase):
@@ -18,7 +27,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
         """
         self.assertIsInstance(
             NSequence(
-                func=i_x,
+                func=identity_x,
             ),
             NSequence,
         )
@@ -32,10 +41,10 @@ class TestNSequenceInstantiation(unittest.TestCase):
         # here.
         self.assertIsInstance(
             NSequence(
-                func=i_x,
-                inverse_func=i_x,
-                indexing_func=i_x,
-                indexing_inverse_func=i_x,
+                func=identity_x,
+                inverse_func=identity_x,
+                indexing_func=identity_x,
+                indexing_inverse_func=identity_x,
                 initial_index=0,
             ),
             NSequence,
@@ -44,9 +53,9 @@ class TestNSequenceInstantiation(unittest.TestCase):
     def test_should_not_instantiate_nsequence_if_func_not_provided(self):
         with pytest.raises(TypeError) as context:
             NSequence(
-                inverse_func=i_x,
-                indexing_func=i_x,
-                indexing_inverse_func=i_x,
+                inverse_func=identity_x,
+                indexing_func=identity_x,
+                indexing_inverse_func=identity_x,
                 initial_index=0,
             )
 
@@ -59,11 +68,15 @@ class TestNSequenceInstantiation(unittest.TestCase):
     def test_should_not_instantiate_nsequence_if_any_bad_object_provided_as_function(
         self,
     ):
+        
+        def f_xyz(x, y, z):
+            return x, y, z
+
 
         with pytest.raises(ArityMismatchError) as context:
             NSequence(
                 #
-                func=b_x,
+                func=f_xyz,
                 initial_index=1,
                 # Bad inverse
                 inverse_func="bad object as func",
@@ -79,7 +92,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
     ):
         with pytest.raises(TypeError) as context:
             NSequence(
-                func=i_x,
+                func=identity_x,
                 initial_index=1,
                 # Bad inverse
                 inverse_func="bad object as func",
@@ -91,7 +104,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
 
         with pytest.raises(TypeError) as context:
             NSequence(
-                func=i_x,
+                func=identity_x,
                 initial_index=1,
                 # Bad objects as functions
                 indexing_func="bad object as func",
@@ -103,7 +116,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
 
         with pytest.raises(TypeError) as context:
             NSequence(
-                func=i_x,
+                func=identity_x,
                 initial_index=1,
                 # Bad objects as functions
                 indexing_inverse_func=list,
@@ -113,7 +126,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
 
         with pytest.raises(TypeError) as context:
             NSequence(
-                func=i_x,
+                func=identity_x,
                 initial_index=1,
                 # Bad objects as functions
                 inverse_func=dict,
@@ -133,7 +146,7 @@ class TestNthTermComputation(unittest.TestCase):
         The default initial_index is 0.
         """
         nsequence1 = NSequence(
-            func=a_x,
+            func=absolute_x,
         )
 
         # Ensure the first term computed is correct
@@ -144,7 +157,7 @@ class TestNthTermComputation(unittest.TestCase):
 
         # Set an initial_index
         nsequence2 = NSequence(
-            func=a_x,
+            func=absolute_x,
             inverse_func=None,
             initial_index=5,
         )
@@ -161,8 +174,8 @@ class TestNthTermComputation(unittest.TestCase):
         """
 
         nsequence1 = NSequence(
-            func=a_x,
-            indexing_func=c_x,
+            func=absolute_x,
+            indexing_func=cubic_x,
         )
 
         # Ensure the first term computed is correct
@@ -176,7 +189,7 @@ class TestSumUpToNthTermComputation(unittest.TestCase):
 
     def test_should_fail_if_bad_position_is_provided(self):
         sequence = NSequence(
-            func=i_x,
+            func=identity_x,
             initial_index=1,
         )
 
@@ -192,7 +205,7 @@ class TestSumUpToNthTermComputation(unittest.TestCase):
 
     def test_should_fail_if_sequence_nth_term_failed(self):
         sequence = NSequence(
-            func=h_x,
+            func=harmonic_x,
             # Make `nth_term` failed
             initial_index=0,
         )
@@ -209,7 +222,7 @@ class TestSumUpToNthTermComputation(unittest.TestCase):
 
     def test_should_compute_sum_up_to_nth_term_if_no_indexing_func_provided(self):
         sequence1 = NSequence(
-            func=q_x,
+            func=quartic_x,
         )
 
         # Ensure we get the correct sum if position is 1. We are supposed
@@ -227,7 +240,7 @@ class TestSumUpToNthTermComputation(unittest.TestCase):
         # Sequence with initial_index
 
         sequence1 = NSequence(
-            func=q_x,
+            func=quartic_x,
             initial_index=2,
         )
 
@@ -243,8 +256,8 @@ class TestSumUpToNthTermComputation(unittest.TestCase):
 
     def test_should_compute_sum_up_to_nth_term_if_indexing_func_provided(self):
         sequence1 = NSequence(
-            func=q_x,
-            indexing_func=l_x,
+            func=quartic_x,
+            indexing_func=linear_x,
         )
 
         # Ensure we get the correct sum if position is 1. We are supposed
@@ -255,8 +268,8 @@ class TestSumUpToNthTermComputation(unittest.TestCase):
         )
 
         sequence2 = NSequence(
-            func=q_x,
-            indexing_func=l_x,
+            func=quartic_x,
+            indexing_func=linear_x,
         )
 
         self.assertEqual(
@@ -271,7 +284,7 @@ class TestIndexOfTermComputation(unittest.TestCase):
         self,
     ):
         sequence = NSequence(
-            func=a_x,
+            func=absolute_x,
         )
 
         with pytest.raises(InversionError) as exc_info:
@@ -288,37 +301,37 @@ class TestIndexOfTermComputation(unittest.TestCase):
         self,
     ):
         sequence1 = NSequence(
-            func=q_x,
+            func=quartic_x,
         )
 
         # Ensure the result is correct for the first term.
         # The default `initial_index` is 0 and the first term is 9
         self.assertEqual(sequence1.index_of_term(9, naive_technic=True), 0)
 
-        # q_x(8) = 4105
+        # quartic_x(8) = 4105
         self.assertEqual(sequence1.index_of_term(4105, naive_technic=True), 8)
 
         # Ensure we get correct results if `initial_index` was set
 
-        sequence2 = NSequence(func=q_x, initial_index=10)
+        sequence2 = NSequence(func=quartic_x, initial_index=10)
 
         # Ensure the result is correct for the first term.
-        # q_x(10) = 10009
+        # quartic_x(10) = 10009
         self.assertEqual(sequence2.index_of_term(10009, naive_technic=True), 10)
 
-        # q_x(14) = 38425
+        # quartic_x(14) = 38425
         self.assertEqual(sequence2.index_of_term(38425, naive_technic=True), 14)
 
         sequence3 = NSequence(
-            func=q_x,
-            indexing_func=c_x,
+            func=quartic_x,
+            indexing_func=cubic_x,
         )
 
         # Ensure the result is correct for the first term.
-        # q_x(c_x(1)) = 10 and c_x(1) = -1
+        # quartic_x(c_x(1)) = 10 and c_x(1) = -1
         self.assertEqual(sequence3.index_of_term(10, naive_technic=True), -1)
 
-        # q_x(c_x(14)) = 42083880609690 and c_x(14) = 2547
+        # quartic_x(c_x(14)) = 42083880609690 and c_x(14) = 2547
         self.assertEqual(
             sequence3.index_of_term(42083880609690, naive_technic=True), 2547
         )
@@ -326,15 +339,15 @@ class TestIndexOfTermComputation(unittest.TestCase):
         # Sequence having descending indexing function
 
         sequence4 = NSequence(
-            func=q_x,
+            func=quartic_x,
             indexing_func=lambda x: -c_x(x),
         )
 
         # Ensure the result is correct for the first term.
-        # q_x(-c_x(1)) = 10 and -c_x(1) = 1
+        # quartic_x(-c_x(1)) = 10 and -c_x(1) = 1
         self.assertEqual(sequence4.index_of_term(10, naive_technic=True), 1)
 
-        # q_x(-c_x(14)) = 42083880609690 and -c_x(14) = -2547
+        # quartic_x(-c_x(14)) = 42083880609690 and -c_x(14) = -2547
         self.assertEqual(
             sequence4.index_of_term(42083880609690, naive_technic=True), -2547
         )
@@ -343,21 +356,21 @@ class TestIndexOfTermComputation(unittest.TestCase):
         self,
     ):
         sequence = NSequence(
-            func=s_x,
+            func=sextique_x,
         )
 
         self.assertEqual(sequence.index_of_term(0, naive_technic=True), 0)
 
     def test_should_compute_index_of_term_using_inverse_func_if_provided(self):
         sequence = NSequence(
-            func=i_x,
+            func=identity_x,
             # The correctness of the `inverse_func` does not matter too much
-            inverse_func=q_x,
+            inverse_func=quartic_x,
         )
 
         self.assertEqual(
             sequence.index_of_term(4),
-            # q_x(4) = 265
+            # quartic_x(4) = 265
             265,
         )
 
@@ -365,31 +378,31 @@ class TestIndexOfTermComputation(unittest.TestCase):
         self,
     ):
         sequence = NSequence(
-            func=i_x,
+            func=identity_x,
             # The correctness of the `inverse_func` does not matter too much
-            inverse_func=q_x,
+            inverse_func=quartic_x,
         )
 
         self.assertEqual(
             sequence.index_of_term(4, naive_technic=True),
-            # q_x(4) = 265
+            # quartic_x(4) = 265
             265,
         )
 
     def test_should_not_raise_indexing_exception_if_param_is_not_activated(self):
         sequence = NSequence(
-            func=i_x,
+            func=identity_x,
             # The correctness of the `inverse_func` does not matter too much
-            inverse_func=h_x,
+            inverse_func=harmonic_x,
         )
 
         self.assertEqual(sequence.index_of_term(4, exact_exception=False), 0.25)
 
     def test_should_not_raise_indexing_exception_if_param_is_activated(self):
         sequence = NSequence(
-            func=i_x,
+            func=identity_x,
             # The correctness of the `inverse_func` does not matter too much
-            inverse_func=h_x,
+            inverse_func=harmonic_x,
         )
 
         with pytest.raises(UnexpectedIndexError) as exc_info:
@@ -405,11 +418,11 @@ class TestIndexOfTermComputation(unittest.TestCase):
         self,
     ):
         sequence = NSequence(
-            func=i_x,
-            indexing_func=q_x,
+            func=identity_x,
+            indexing_func=quartic_x,
             # The correctness of the `inverse_func` does not matter too much
             # but should just be chosen to avoid coincidences
-            inverse_func=h_x,
+            inverse_func=harmonic_x,
         )
 
         self.assertEqual(sequence.index_of_term(4, exact_exception=False), 0.25)
@@ -420,7 +433,7 @@ class TestCountTermsBetweenTermsComputation(unittest.TestCase):
         self,
     ):
         sequence = NSequence(
-            func=i_x,
+            func=identity_x,
         )
 
         with pytest.raises(InversionError) as exc_info:
@@ -433,16 +446,16 @@ class TestCountTermsBetweenTermsComputation(unittest.TestCase):
         )
 
     def test_should_compute_count_terms_between_terms_if_inverse_func_provided(self):
-        sequence1 = NSequence(func=l_x, inverse_func=lambda y: (y + 18) / 11)
+        sequence1 = NSequence(func=linear_x, inverse_func=lambda y: (y + 18) / 11)
 
         # When the two terms are the same and with the default initial_index
         self.assertEqual(sequence1.count_terms_between_terms(-18, -18), 1)
 
-        # l_x(10) = 92
+        # linear_x(10) = 92
         self.assertEqual(sequence1.count_terms_between_terms(-18, 92), 11)
 
         sequence2 = NSequence(
-            func=l_x,
+            func=linear_x,
             inverse_func=lambda y: (y + 18) / 11,
             initial_index=3,
         )
@@ -450,27 +463,27 @@ class TestCountTermsBetweenTermsComputation(unittest.TestCase):
         # When the two terms are the same and with the default initial_index
         self.assertEqual(sequence2.count_terms_between_terms(15, 15), 1)
 
-        # l_x(10) = 92
+        # linear_x(10) = 92
         self.assertEqual(sequence2.count_terms_between_terms(15, 92), 8)
 
         # With indexing function provided
 
         sequence3 = NSequence(
-            func=l_x,
+            func=linear_x,
             inverse_func=lambda y: (y + 18) / 11,
-            indexing_func=q_x,
+            indexing_func=quartic_x,
         )
 
-        # l_x(q_x(1)) = 92
+        # linear_x(quartic_x(1)) = 92
         self.assertEqual(sequence1.count_terms_between_terms(92, 92), 1)
 
-        # l_x(q_x(10)) = 110081
+        # linear_x(quartic_x(10)) = 110081
         self.assertEqual(sequence3.count_terms_between_terms(92, 110081), 10)
 
     def test_should_raise_exception_if_inverse_func_gives_decimal_bad_index_for_any_provided_term(
         self,
     ):
-        sequence1 = NSequence(func=l_x, inverse_func=lambda y: (y + 18) / 11)
+        sequence1 = NSequence(func=linear_x, inverse_func=lambda y: (y + 18) / 11)
 
         with pytest.raises(UnexpectedIndexError) as exc_info:
             # Provide terms that will make the inverse_func returns decimals
@@ -484,7 +497,7 @@ class TestCountTermsBetweenTermsComputation(unittest.TestCase):
 
     def test_should_raise_exception_if_inverse_func_gives_non_zero_decimal_float(self):
         sequence = NSequence(
-            func=i_x,
+            func=identity_x,
             initial_index=1,
             # Bad inverse
             inverse_func=lambda y: 1 / y,
@@ -503,7 +516,7 @@ class TestCountTermsBetweenTermsComputation(unittest.TestCase):
 class TestCountTermsBetweenIndices(unittest.TestCase):
     def test_should_count_terms_between_indices_if_no_indexing_func_provided(self):
         sequence1 = NSequence(
-            func=l_x,
+            func=linear_x,
         )
 
         # When the two terms are the same and with the default initial_index
@@ -513,7 +526,7 @@ class TestCountTermsBetweenIndices(unittest.TestCase):
 
         # Sequence with custom initial_index
         sequence2 = NSequence(
-            func=l_x,
+            func=linear_x,
             initial_index=4,
         )
 
@@ -528,8 +541,8 @@ class TestCountTermsBetweenIndices(unittest.TestCase):
     ):
         """Ensure that we (kinda) brute-force to imitate the indexing_inverse_func behavior"""
         sequence1 = NSequence(
-            func=l_x,
-            indexing_func=q_x,
+            func=linear_x,
+            indexing_func=quartic_x,
         )
 
         # When the two terms are the same
@@ -543,11 +556,11 @@ class TestCountTermsBetweenIndices(unittest.TestCase):
         """Ensure `indexing_inverse_func` is used to do the computation"""
 
         sequence1 = NSequence(
-            func=l_x,
-            indexing_func=q_x,
+            func=linear_x,
+            indexing_func=quartic_x,
             # We don't care about the effectiveness of the `indexing_inverse_func` here
             # We just want to make sure that indexing_inverse_func is used to compute the count
-            indexing_inverse_func=i_x,
+            indexing_inverse_func=identity_x,
         )
 
         # When the two terms are the same
@@ -557,11 +570,11 @@ class TestCountTermsBetweenIndices(unittest.TestCase):
 
     def test_should_raise_indices_exception_if_bad_indices_provided(self):
         sequence1 = NSequence(
-            func=l_x,
-            indexing_func=q_x,
+            func=linear_x,
+            indexing_func=quartic_x,
             # We don't care about the effectiveness of the `indexing_inverse_func` here
             # We just want to make sure that indexing_inverse_func is used to compute the count
-            indexing_inverse_func=h_x,
+            indexing_inverse_func=harmonic_x,
         )
 
         # When the two terms are the same
@@ -579,7 +592,7 @@ class TestTermsBetweenIndicesComputation(unittest.TestCase):
 
     def test_should_compute_terms_between_indices_if_no_indexing_func_provided(self):
         sequence1 = NSequence(
-            func=l_x,
+            func=linear_x,
         )
 
         # When the two terms are the same and with the default initial_index
@@ -592,7 +605,7 @@ class TestTermsBetweenIndicesComputation(unittest.TestCase):
 
         # Sequence with custom initial_index
         sequence2 = NSequence(
-            func=l_x,
+            func=linear_x,
             initial_index=4,
         )
 
@@ -605,8 +618,8 @@ class TestTermsBetweenIndicesComputation(unittest.TestCase):
         self,
     ):
         sequence1 = NSequence(
-            func=l_x,
-            indexing_func=q_x,
+            func=linear_x,
+            indexing_func=quartic_x,
         )
 
         # When the two terms are the same
@@ -621,11 +634,11 @@ class TestTermsBetweenIndicesComputation(unittest.TestCase):
         self,
     ):
         sequence1 = NSequence(
-            func=l_x,
-            indexing_func=q_x,
+            func=linear_x,
+            indexing_func=quartic_x,
             # We don't care about the effectiveness of the `indexing_inverse_func` here
             # We just want to make sure that indexing_inverse_func is used to do the computation
-            indexing_inverse_func=i_x,
+            indexing_inverse_func=identity_x,
         )
 
         # When the two terms are the same
@@ -652,7 +665,7 @@ class TestTermsBetweenIndicesComputation(unittest.TestCase):
 class TestNearestEntryComputation(unittest.TestCase):
     def test_should_compute_nearest_entry_naively_if_param_activated(self):
         sequence = NSequence(
-            func=q_x,
+            func=quartic_x,
         )
 
         # When the term is one entry of the sequence (the default `initial_index`)
@@ -663,9 +676,9 @@ class TestNearestEntryComputation(unittest.TestCase):
 
     def test_should_compute_nearest_entry_inversely_if_param_activated(self):
         sequence = NSequence(
-            func=q_x,
+            func=quartic_x,
             # Here, the effectiveness of the inverse_func does not matter
-            inverse_func=i_x,
+            inverse_func=identity_x,
         )
 
         # When the term is a term of the sequence
@@ -679,15 +692,15 @@ class TestNearestEntryComputation(unittest.TestCase):
 class TestNSequenceProperties(unittest.TestCase):
 
     def test_initial_term(self):
-        self.assertEqual(NSequence(func=s_x).initial_term, 0)
-        self.assertEqual(NSequence(func=l_x, initial_index=4).initial_term, 26)
+        self.assertEqual(NSequence(func=sextique_x).initial_term, 0)
+        self.assertEqual(NSequence(func=linear_x, initial_index=4).initial_term, 26)
 
     def test_initial_index(self):
-        self.assertEqual(NSequence(func=s_x, initial_index=50).initial_index, 50)
+        self.assertEqual(NSequence(func=sextique_x, initial_index=50).initial_index, 50)
 
         # When indexing func provided, initial_index is ignored
         self.assertEqual(
-            NSequence(func=i_x, indexing_func=q_x, initial_index=400).initial_index, 10
+            NSequence(func=identity_x, indexing_func=quartic_x, initial_index=400).initial_index, 10
         )
 
 

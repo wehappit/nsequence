@@ -1,18 +1,14 @@
 import functools
 import inspect
-import logging
+
 from typing import Callable, Any
-
 from math import ceil, floor
-
 
 # TODO: Doc about funcs monotony and continuity
 # TODO: Fix docstrings
 # TODO: Fix typing (some funcs should have float / int or float as return type
 # TODO: Don't let the user set indexing_func and initial_index car in such case initial_index = indexing_func(1)
 number = int | float
-
-logger = logging.getLogger(__name__)
 
 
 class ArityMismatchError(Exception):
@@ -50,13 +46,13 @@ class NSequence(object):
     DEFAULT_INITIAL_INDEX = 0
 
     def __init__(
-        self,
-        *,
-        func: Callable[[int], number],
-        inverse_func: Callable[[number], number] = None,
-        indexing_func: Callable[[int], int] = None,
-        indexing_inverse_func: Callable[[number], number] = None,
-        initial_index=None,
+            self,
+            *,
+            func: Callable[[int], number],
+            inverse_func: Callable[[number], number] = None,
+            indexing_func: Callable[[int], int] = None,
+            indexing_inverse_func: Callable[[number], number] = None,
+            initial_index=None,
     ) -> None:
         super().__init__()
 
@@ -117,8 +113,7 @@ class NSequence(object):
 
         try:
             sum_to_return = sum(self.nth_term(position) for position in range(1, n + 1))
-            # `OverflowError` can occur if n is too large
-        except (TypeError, ValueError, ZeroDivisionError, OverflowError) as exc:
+        except (TypeError, ValueError, ArithmeticError) as exc:
             raise NotImplementedError(
                 "Failed to compute the sequence's n first terms sum with the default `sump_up_func`."
                 "The default `sump_up_func` implementation seems not appropriate for your use case."
@@ -131,7 +126,7 @@ class NSequence(object):
 
     @functools.lru_cache(maxsize=128)
     def index_of_term(
-        self, term: float, naive_technic=False, exact_exception=True
+            self, term: float, naive_technic=False, exact_exception=True
     ) -> int:
         # DOCME: naive_technic is ignored if the sequence inversion func is provided
         """
@@ -263,12 +258,12 @@ class NSequence(object):
         ]
 
     def nearest_term_index(
-        self,
-        term_neighbor: float,
-        inversion_technic=True,
-        starting_position=1,
-        iter_limit=1000,
-        prefer_left_term=True,
+            self,
+            term_neighbor: float,
+            inversion_technic=True,
+            starting_position=1,
+            iter_limit=1000,
+            prefer_left_term=True,
     ):
         """
         Finds the index of the nearest term in the sequence to a given term.
@@ -294,12 +289,12 @@ class NSequence(object):
         return nearest_term_index
 
     def nearest_term(
-        self,
-        term_neighbor: float,
-        inversion_technic=True,
-        starting_position=1,
-        iter_limit=1000,
-        prefer_left_term=True,
+            self,
+            term_neighbor: float,
+            inversion_technic=True,
+            starting_position=1,
+            iter_limit=1000,
+            prefer_left_term=True,
     ) -> number:
         """Gets the nearest term in the sequence to the given `term_neighbor`."""
 
@@ -314,12 +309,12 @@ class NSequence(object):
         return nearest_term
 
     def nearest_entry(
-        self,
-        term_neighbor: float,
-        inversion_technic=bool,
-        starting_position=1,
-        iter_limit=1000,
-        prefer_left_term=True,
+            self,
+            term_neighbor: float,
+            inversion_technic=bool,
+            starting_position=1,
+            iter_limit=1000,
+            prefer_left_term=True,
     ):
         # Continuity and monotony problem
         """
@@ -399,11 +394,11 @@ class NSequence(object):
 
     @functools.lru_cache(maxsize=128)
     def __naively_get_sequence_nearest_entry(
-        self,
-        term_neighbor: float,
-        starting_position=1,
-        iter_limit=1000,
-        prefer_left_term=True,
+            self,
+            term_neighbor: float,
+            starting_position=1,
+            iter_limit=1000,
+            prefer_left_term=True,
     ):
         # You have another idea ? Let's discuss it
 
@@ -417,7 +412,7 @@ class NSequence(object):
         for index, term in lazy_generated_pairs:
             distance = abs(term - term_neighbor)
             if (distance == min_distance and not prefer_left_term) or (
-                distance < min_distance
+                    distance < min_distance
             ):
                 min_distance = distance
                 nearest_term_index = index
@@ -428,9 +423,9 @@ class NSequence(object):
 
     @functools.lru_cache(maxsize=128)
     def __inversely_get_sequence_nearest_entry(
-        self,
-        term_neighbor: float,
-        prefer_left_term=True,
+            self,
+            term_neighbor: float,
+            prefer_left_term=True,
     ) -> tuple[int, number]:
         # Here the index of `term_neighbor` can be floated because it
         # may not be one of the sequence's terms.
@@ -439,7 +434,7 @@ class NSequence(object):
 
         # If position is integer then index should too
         if self.__is_integer(term_neighbor_position) and not self.__is_integer(
-            term_neighbor_index
+                term_neighbor_index
         ):
             raise UnexpectedIndexError(
                 f"Expect index of position {term_neighbor_position} to be an integer, "
@@ -447,11 +442,11 @@ class NSequence(object):
             )
 
         if all(
-            self.__is_integer(val)
-            for val in (
-                term_neighbor_position,
-                term_neighbor_index,
-            )
+                self.__is_integer(val)
+                for val in (
+                        term_neighbor_position,
+                        term_neighbor_index,
+                )
         ):
             # The provided term is a term of the sequence so do nothing
             return term_neighbor_index, term_neighbor
@@ -466,8 +461,8 @@ class NSequence(object):
         right_distance_to_neighbor = abs(term_neighbor - right_nearest_term)
 
         if (
-            not prefer_left_term
-            and left_distance_to_neighbor == right_distance_to_neighbor
+                not prefer_left_term
+                and left_distance_to_neighbor == right_distance_to_neighbor
         ):
             nearest_term_position = right_nearest_term_position
         elif left_distance_to_neighbor > right_distance_to_neighbor:
@@ -529,7 +524,7 @@ class NSequence(object):
 
     @staticmethod
     def __validate_func(
-        func_to_validate: Any, expected_arity: int = 0, is_optional=True
+            func_to_validate: Any, expected_arity: int = 0, is_optional=True
     ):
         """
         Ensure that `func_to_validate` is a function and has the correct number of
@@ -558,5 +553,6 @@ class NSequence(object):
         for param, value in kwargs.items():
             if value is None:
                 continue
-            logger.warning(msg)
+            # logger.warning(msg)
+            # assert not not_none_kwargs, msg
             not_none_kwargs[param] = value
