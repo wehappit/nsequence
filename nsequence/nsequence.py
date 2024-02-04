@@ -68,13 +68,13 @@ class NSequence(object):
         for _opt_func, _arity in _optional_funcs_entries:
             self.__validate_func(_opt_func, expected_arity=_arity)
 
-        # self.__validate_mutually_exclusive_params(
-        #    "When `indexing_func` is defined, `initial_index` becomes automatically "
-        #    "`indexing_func` image by the first position that is always 1. The intend "
-        #    "of this is to help you better to know what you're doing.",
-        #    initial_index=initial_index,
-        #    indexing_func=indexing_func,
-        # )
+        self.__validate_mutually_exclusive_params(
+           "When `indexing_func` is defined, `initial_index` becomes automatically "
+           "`indexing_func` image by the first position that is always 1. The intend "
+           "of this is to help you better to be aware of what you're doing.",
+           initial_index=initial_index,
+           indexing_func=indexing_func,
+        )
 
         # This function may hold the implementation of a recursive sequence.
         # In that case, the client could have added caching capability to the
@@ -554,8 +554,7 @@ class NSequence(object):
         for param, value in kwargs.items():
             if value is None:
                 continue
-            if not_none_kwargs:
-                # We've already got a parameter set.
-                # TODO: improve exc name ?
-                raise ValueError(msg)
+
+            assert not_none_kwargs, msg
+
             not_none_kwargs[param] = value
