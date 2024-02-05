@@ -31,27 +31,27 @@ Create a sequence instance
 
 - `initial_index`: The starting index for the sequence. This parameter is ignored if `indexing_func` is provided, as the initial index will then be derived from the indexing function.
 
-## nth_term
+### nth_term
 Returns the sequence term at the given position
 
 #### Parameters
 - `position`: Position in the sequence to calculate the term for.
 
 
-## position_of_index
+### position_of_index
 Determines the sequence position of a given index, useful when custom indexing is used.
 
 #### Parameters
 - `index`: The index for which to find the corresponding sequence position.
 
-## count_terms_between_indices
+### count_terms_between_indices
 Counts the number of terms between two indices in the sequence.
 
 #### Parameters
 - `index1`: The starting index.
 - `index2`: The ending index.
 
-## nearest_entry
+### nearest_entry
 Finds the nearest sequence entry (both the index and the term) to a given term.
 
 #### Parameters
@@ -61,7 +61,7 @@ Finds the nearest sequence entry (both the index and the term) to a given term.
 - `iter_limit`: The maximum number of iterations for the search (ignored if `inversion_technic` is True).
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
-## terms_between_terms
+### terms_between_terms
 Returns a list of sequence terms located between two given terms, inclusive.
 
 #### Parameters
