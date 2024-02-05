@@ -1,6 +1,7 @@
 # NSequence
 
-NSequence is a Python library designed for handling sequences, offering various functions and utilities for working with mathematical sequences. Whether you're dealing with linear, quadratic, or more complex sequences, NSequence provides tools to compute terms, sums, and indices efficiently.
+NSequence is a Python library designed for handling progressions or sequences, offering various functions and utilities for working with sequences. It allows users to define sequences through functional expressions, offering capabilities for various computations.
+
 
 ## Key Features
 
@@ -11,6 +12,33 @@ NSequence is a Python library designed for handling sequences, offering various 
 - **Inverse Functionality**: For invertible sequences, NSequence facilitates finding the index of a given term and vice versa. It provides options for different inversion techniques to suit your specific use case.
 
 - **Nearest Term Search**: NSequence allows you to find the index of the nearest term to a given value in the sequence. It provides flexibility in handling tie-breakers and preferences.
+
+## Key Methods Presentation
+
+### Constructor
+
+```python
+def __init__(
+    self,
+    *,
+    func: Callable[[int], number],
+    inverse_func: Callable[[number], number] = None,
+    indexing_func: Callable[[int], int] = None,
+    indexing_inverse_func: Callable[[number], number] = None,
+    initial_index=None,
+) -> None:
+```
+#### Parameters
+
+`func`: The primary function defining the sequence. This function must accept an integer position and return the corresponding sequence term.
+
+`inverse_func`: An optional inverse function for func, allowing for the computation of positions or indices based on sequence term values.
+
+`indexing_func`: An optional function that maps sequence positions to custom indices, enabling non-standard indexing schemes.
+
+`indexing_inverse_func`: The inverse of indexing_func, allowing for the determination of sequence positions from indices.
+
+`initial_index`: The starting index for the sequence. This parameter is ignored if indexing_func is provided, as the initial index will then be derived from the indexing function.
 
 ## Real-world Examples
 
@@ -61,7 +89,7 @@ terms_between_5_and_10 = invertible_sequence.terms_between_indices(5, 10)
 You can install NSequence using pip:
 
 ```bash
-pip install NSequence
+pip install nsequence
 ```
 
 ## Getting Started
@@ -77,6 +105,6 @@ term_3 = my_sequence.nth_term(3)
 sum_first_5_terms = my_sequence.sum_up_to_nth_term(5)
 ```
 
-Explore more about NSequence and its capabilities in the [documentation](https://github.com/yourusername/NSequence).
+Explore more about NSequence and its capabilities in the [documentation](https://github.com/hjisaac/NSequence).
 
 Feel free to contribute, report issues, or suggest enhancements. Happy sequencing! 📈
