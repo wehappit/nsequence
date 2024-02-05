@@ -82,6 +82,18 @@ Returns the sum of the sequence up to the nth term.
 - `naive_technic`: If True and no inverse function is provided, uses a brute-force search to find the index. Defaults to False.
 - `exact_exception`:  If True, raises an exception if the term does not exactly match any sequence term. Defaults to True.
 
+### count_terms_between_terms
+Counts the number of terms between two given terms in the sequence, using 
+the sequence's inverse function to find their indices.
+
+This method is meaningful for sequences where a bijective (one-to-one and
+onto) relationship exists between terms and their indices.
+
+#### Parameters
+- `term1` (float): The first term in the sequence.
+- `term2` (float): The second term in the sequence.
+
+
 
 ## Real-world Examples
 
