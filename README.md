@@ -68,6 +68,20 @@ Returns a list of sequence terms located between two given terms, inclusive.
 - `term1`: The first term.
 - `term2`: The second term.
 
+### sum_up_to_nth_term
+Calculate the sum of the sequence up to the nth term.
+
+#### Parameters
+- `n`: The position up to which the sum is to be calculated. Must be a positive integer.
+- 
+### index_of_term
+Returns the sum of the sequence up to the nth term.
+
+#### Parameters
+- `term`:  The sequence term to find the index for.
+- `naive_technic`: If True and no inverse function is provided, uses a brute-force search to find the index. Defaults to False.
+- `exact_exception`:  If True, raises an exception if the term does not exactly match any sequence term. Defaults to True.
+
 
 ## Real-world Examples
 

@@ -119,8 +119,8 @@ class NSequence(object):
         to the nth term by individually calculating each term's value and summing them up.
 
         Args:
-            n (int): The position up to which the sum is to be calculated. Must be a
-            positive integer.
+            n (int): .The position up to which the sum is to be calculated. Must be a
+            positive integer
 
         Returns:
             number (int or float): The sum of the sequence's terms up to the nth term.
