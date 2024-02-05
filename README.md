@@ -17,17 +17,19 @@ NSequence is a Python library designed for handling progressions or sequences, o
 
 ### Constructor
 
+The constructor in its raw form.
+
 ```python
 def __init__(
     self,
     *,
-    func: Callable[[int], Any],
-    inverse_func: Callable[[Any], number] = None,
+    func: Callable[[int], number],
+    inverse_func: Callable[[number], number] = None,
     indexing_func: Callable[[int], int] = None,
     indexing_inverse_func: Callable[[number], number] = None,
-    initial_index:int = None,
+    initial_index: int = None,
 ) -> None:
-    ...
+
 ```
 #### Parameters
 
