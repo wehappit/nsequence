@@ -30,7 +30,7 @@ def __init__(
 ```
 #### Parameters
 
-- `func`: The primary function defining the sequence.
+- `func`: The primary function defining the sequence. This function must accept an integer position and return the corresponding sequence term.
 
 - `inverse_func`: An optional inverse function for `func`, allowing for the computation of positions or indices based on sequence term values.
 
