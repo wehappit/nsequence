@@ -5,21 +5,21 @@ import pytest
 from ..nsequence.nsequence import NSequence
 from ..nsequence.exceptions import (
     ArityMismatchError,
-    UnexpectedIndexError, 
-    UnexpectedPositionError, 
-    InversionError, 
+    UnexpectedIndexError,
+    UnexpectedPositionError,
+    InversionError,
     # IndexNotFoundError,
-) 
+)
 
 
 identity_x = lambda x: x
 linear_x = lambda x: 11 * x - 18
-quartic_x = lambda x: x ** 4 + 9
+quartic_x = lambda x: x**4 + 9
 absolute_x = lambda x: abs(x - 20)
-cubic_x = lambda x: x ** 3 - x ** 2 - 1
+cubic_x = lambda x: x**3 - x**2 - 1
 harmonic_x = lambda x: 1 / x
 # Used when injective function is needed x(x−1)(x−2)(x−3)(x−4)(x-5)
-sextique_x = lambda x: x ** 6 - 10 * (x ** 5) + 35 * (x ** 4) - 50 * (x ** 3) + 24 * (x ** 2)
+sextique_x = lambda x: x**6 - 10 * (x**5) + 35 * (x**4) - 50 * (x**3) + 24 * (x**2)
 
 
 class TestNSequenceInstantiation(unittest.TestCase):
@@ -67,14 +67,12 @@ class TestNSequenceInstantiation(unittest.TestCase):
             context.value.args[0],
         )
 
-
     def test_should_not_instantiate_nsequence_if_any_bad_object_provided_as_function(
         self,
     ):
-        
+
         def f_xyz(x, y, z):
             return x, y, z
-
 
         with pytest.raises(ArityMismatchError) as context:
             NSequence(
@@ -88,7 +86,6 @@ class TestNSequenceInstantiation(unittest.TestCase):
         self.assertTrue(
             "Function f_xyz expected 1 argument(s), but got 3", context.value.args[0]
         )
-
 
     def test_should_not_instantiate_nsequence_if_any_bad_object_provided_as_function(
         self,
@@ -703,7 +700,10 @@ class TestNSequenceProperties(unittest.TestCase):
 
         # When indexing func provided, initial_index is ignored
         self.assertEqual(
-            NSequence(func=identity_x, indexing_func=quartic_x, initial_index=400).initial_index, 10
+            NSequence(
+                func=identity_x, indexing_func=quartic_x, initial_index=400
+            ).initial_index,
+            10,
         )
 
 
