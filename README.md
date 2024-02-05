@@ -30,15 +30,15 @@ def __init__(
 ```
 #### Parameters
 
-`func`: The primary function defining the sequence. This function must accept an integer position and return the corresponding sequence term.
+- `func`: The primary function defining the sequence.
 
-`inverse_func`: An optional inverse function for func, allowing for the computation of positions or indices based on sequence term values.
+- `inverse_func`: An optional inverse function for `func`, allowing for the computation of positions or indices based on sequence term values.
 
-`indexing_func`: An optional function that maps sequence positions to custom indices, enabling non-standard indexing schemes.
+- `indexing_func`: An optional function that maps sequence positions to custom indices, enabling non-standard indexing schemes.
 
-`indexing_inverse_func`: The inverse of indexing_func, allowing for the determination of sequence positions from indices.
+- `indexing_inverse_func`: The inverse of `indexing_func`, allowing for the determination of sequence positions from indices.
 
-`initial_index`: The starting index for the sequence. This parameter is ignored if indexing_func is provided, as the initial index will then be derived from the indexing function.
+- `initial_index`: The starting index for the sequence. This parameter is ignored if `indexing_func` is provided, as the initial index will then be derived from the indexing function.
 
 ## Real-world Examples
 
