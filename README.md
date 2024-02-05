@@ -15,7 +15,7 @@ NSequence is a Python library designed for handling progressions or sequences, o
 
 ## Key Methods Presentation
 
-### Constructor .i.e \_\_init\_\_
+### Constructor .i.e `__init__`
 
 Create a sequence instance
 
