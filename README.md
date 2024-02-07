@@ -36,9 +36,6 @@ term_3 = my_sequence.nth_term(3)
 sum_first_5_terms = my_sequence.sum_up_to_nth_term(5)
 ```
 
-## Real-world Examples
-
-### Linear Sequence
 
 ```python
 # Create a linear sequence: f(x) = 2x + 3
@@ -54,7 +51,16 @@ index_of_13 = linear_sequence.index_of_term(13)
 sum_first_10_terms = linear_sequence.sum_up_to_nth_term(10)
 ```
 
-### Quadratic Sequence
+```python
+# Create a quadratic sequence: f(x) = x^2 + 3
+quadratic_sequence = NSequence(func=lambda x: x ** 2 + 3)
+
+# Get the nearest term to 20
+nearest_term_to_20 = quadratic_sequence.nearest_term(20)
+
+# Count the terms between 10 and 50
+count_terms_between_10_and_50 = quadratic_sequence.count_terms_between_terms(10, 50)
+```
 
 ```python
 # Create a quadratic sequence: f(x) = x^2 + 3
@@ -67,8 +73,6 @@ nearest_term_to_20 = quadratic_sequence.nearest_term(20)
 count_terms_between_10_and_50 = quadratic_sequence.count_terms_between_terms(10, 50)
 ```
 
-### Invertible Sequence
-
 ```python
 # Create an invertible sequence with inverse function
 invertible_sequence = NSequence(func=lambda x: 2 * x, inverse_func=lambda y: y / 2)
@@ -79,6 +83,9 @@ index_of_8 = invertible_sequence.index_of_term(8)
 # Compute the terms between indices 5 and 10
 terms_between_5_and_10 = invertible_sequence.terms_between_indices(5, 10)
 ```
+
+## Real-world Examples
+
 
 ## Key Methods
 
