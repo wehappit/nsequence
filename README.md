@@ -3,6 +3,7 @@
 NSequence is a Python library designed for handling progressions or sequences, offering various functions and utilities for working with sequences. It allows users to define sequences through functional expressions, offering capabilities for various computations.
 
 
+
 ## Key Features
 
 - **Versatile Sequence Handling**: NSequence supports a wide range of sequence types, including linear, quadratic, cubic, and more. It accommodates both direct and inverse calculations.
@@ -12,6 +13,29 @@ NSequence is a Python library designed for handling progressions or sequences, o
 - **Inverse Functionality**: For invertible sequences, NSequence facilitates finding the index of a given term and vice versa. It provides options for different inversion techniques to suit your specific use case.
 
 - **Nearest Term Search**: NSequence allows you to find the index of the nearest term to a given value in the sequence. It provides flexibility in handling tie-breakers and preferences.
+
+
+## Installation
+
+You can install NSequence using pip:
+
+```bash
+pip install nsequence
+```
+
+## Getting Started
+
+```python
+from NSequence import NSequence
+
+# Create your sequence
+my_sequence = NSequence(func=lambda x: x * 2)
+
+# Use the sequence functionalities
+term_3 = my_sequence.nth_term(3)
+sum_first_5_terms = my_sequence.sum_up_to_nth_term(5)
+```
+
 
 ## Key Methods
 
@@ -137,27 +161,6 @@ index_of_8 = invertible_sequence.index_of_term(8)
 
 # Compute the terms between indices 5 and 10
 terms_between_5_and_10 = invertible_sequence.terms_between_indices(5, 10)
-```
-
-## Installation
-
-You can install NSequence using pip:
-
-```bash
-pip install nsequence
-```
-
-## Getting Started
-
-```python
-from NSequence import NSequence
-
-# Create your sequence
-my_sequence = NSequence(func=lambda x: x * 2)
-
-# Use the sequence functionalities
-term_3 = my_sequence.nth_term(3)
-sum_first_5_terms = my_sequence.sum_up_to_nth_term(5)
 ```
 
 Explore more about NSequence and its capabilities in the [documentation](https://github.com/hjisaac/NSequence).
