@@ -13,7 +13,7 @@ NSequence is a Python library designed for handling progressions or sequences, o
 
 - **Nearest Term Search**: NSequence allows you to find the index of the nearest term to a given value in the sequence. It provides flexibility in handling tie-breakers and preferences.
 
-## Key Methods Presentation
+## Key Methods
 
 ### Constructor .i.e `__init__`
 
@@ -31,27 +31,27 @@ Create a sequence instance
 
 - `initial_index`: The starting index for the sequence. This parameter is ignored if `indexing_func` is provided, as the initial index will then be derived from the indexing function.
 
-### nth_term
+### `nth_term`
 Returns the sequence term at the given position
 
 #### Parameters
 - `position`: Position in the sequence to calculate the term for.
 
 
-### position_of_index
+### `position_of_index`
 Determines the sequence position of a given index, useful when custom indexing is used.
 
 #### Parameters
 - `index`: The index for which to find the corresponding sequence position.
 
-### count_terms_between_indices
+### `count_terms_between_indices`
 Counts the number of terms between two indices in the sequence.
 
 #### Parameters
 - `index1`: The starting index.
 - `index2`: The ending index.
 
-### nearest_entry
+### `nearest_entry`
 Finds the nearest sequence entry (both the index and the term) to a given term.
 
 #### Parameters
@@ -61,20 +61,20 @@ Finds the nearest sequence entry (both the index and the term) to a given term.
 - `iter_limit`: The maximum number of iterations for the search (ignored if `inversion_technic` is True).
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
-### terms_between_terms
+### `terms_between_terms`
 Returns a list of sequence terms located between two given terms, inclusive.
 
 #### Parameters
 - `term1`: The first term.
 - `term2`: The second term.
 
-### sum_up_to_nth_term
+### `sum_up_to_nth_term`
 Calculate the sum of the sequence up to the nth term.
 
 #### Parameters
 - `n`: The position up to which the sum is to be calculated. Must be a positive integer.
 - 
-### index_of_term
+### `index_of_term`
 Returns the sum of the sequence up to the nth term.
 
 #### Parameters
@@ -82,7 +82,7 @@ Returns the sum of the sequence up to the nth term.
 - `naive_technic`: If True and no inverse function is provided, uses a brute-force search to find the index. Defaults to False.
 - `exact_exception`:  If True, raises an exception if the term does not exactly match any sequence term. Defaults to True.
 
-### count_terms_between_terms
+### `count_terms_between_terms`
 Counts the number of terms between two given terms in the sequence, using 
 the sequence's inverse function to find their indices.
 
