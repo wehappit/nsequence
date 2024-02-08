@@ -28,8 +28,13 @@ pip install nsequence
 ```python
 from NSequence import NSequence
 
+def my_function(x):
+    # Do something with x and return what you want
+    # ...
+    return x * 2
+
 # Create your sequence
-my_sequence = NSequence(func=lambda x: x * 2)
+my_sequence = NSequence(func=my_function)
 
 # Use the sequence functionalities
 term_3 = my_sequence.nth_term(3)
