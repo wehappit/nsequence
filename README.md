@@ -2,7 +2,13 @@
 
 NSequence is a Python library designed for handling progressions or sequences, offering various functions and utilities for working with sequences. It allows users to define sequences through functional expressions, offering capabilities for various computations.
 
+## Real-world Usage
 
+Imagine developing a complex reminder system, deeply integrated into your company's operational processes, where business-critical information is attached to each reminder. In this context, for forecasting and planning purposes, it becomes essential to be able to interact with the system in such a way as to :
+
+Recover data from a given period in the past: This could be necessary to analyze the effectiveness of reminders sent, understand user behavior in the face of these reminders, or adjust marketing strategies based on the responses obtained. The ability to go back in time and extract specific data would enable precise evaluation of past performance and in-depth understanding of historical trends.
+
+Retrieve data for a future period: This is crucial for planning future activities, allocating the necessary resources, and forecasting the impact of recalls on business operations. Whether it's to ensure that stocks are sufficient for an upcoming promotion mentioned in recalls, or to prepare customer support teams for an expected increase in user interactions, access to reliable forecasts based on planned recalls is essential.
 
 ## Key Features
 
@@ -41,7 +47,6 @@ term_3 = my_sequence.nth_term(3)
 sum_first_5_terms = my_sequence.sum_up_to_nth_term(5)
 ```
 
-
 ```python
 # Create a linear sequence: f(x) = 2x + 3
 linear_sequence = NSequence(func=lambda x: 2 * x + 3)
@@ -78,7 +83,6 @@ index_of_8 = invertible_sequence.index_of_term(8)
 terms_between_5_and_10 = invertible_sequence.terms_between_indices(5, 10)
 ```
 
-## Real-world Examples
 
 
 ## Key Methods
