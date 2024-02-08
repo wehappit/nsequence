@@ -4,11 +4,9 @@ NSequence is a Python library designed for handling progressions or sequences, o
 
 ## Real-world Usage
 
-Imagine developing a complex reminder system, deeply integrated into your company's operational processes, where business-critical information is attached to each reminder. In this context, for forecasting and planning purposes, it becomes essential to be able to interact with the system in such a way as to :
-
-Recover data from a given period in the past: This could be necessary to analyze the effectiveness of reminders sent, understand user behavior in the face of these reminders, or adjust marketing strategies based on the responses obtained. The ability to go back in time and extract specific data would enable precise evaluation of past performance and in-depth understanding of historical trends.
-
-Retrieve data for a future period: This is crucial for planning future activities, allocating the necessary resources, and forecasting the impact of recalls on business operations. Whether it's to ensure that stocks are sufficient for an upcoming promotion mentioned in recalls, or to prepare customer support teams for an expected increase in user interactions, access to reliable forecasts based on planned recalls is essential.
+Imagine you're developing a complex event reminder system, 
+where data is attached to each reminder. For forecasting and planning purposes, you want to retrieve for a given event
+ recall data for a given period in the past (or future)
 
 ## Key Features
 
