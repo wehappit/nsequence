@@ -63,17 +63,6 @@ count_terms_between_10_and_50 = quadratic_sequence.count_terms_between_terms(10,
 ```
 
 ```python
-# Create a quadratic sequence: f(x) = x^2 + 3
-quadratic_sequence = NSequence(func=lambda x: x ** 2 + 3)
-
-# Get the nearest term to 20
-nearest_term_to_20 = quadratic_sequence.nearest_term(20)
-
-# Count the terms between 10 and 50
-count_terms_between_10_and_50 = quadratic_sequence.count_terms_between_terms(10, 50)
-```
-
-```python
 # Create an invertible sequence with inverse function
 invertible_sequence = NSequence(func=lambda x: 2 * x, inverse_func=lambda y: y / 2)
 
