@@ -13,9 +13,6 @@ from .exceptions import (
 )
 
 # TODO: Doc about funcs monotony and continuity
-# TODO: Fix typing (some funcs should have float / int or float as return type
-# TODO: Use Any for term
-# TODO: Use datetime in readme reallife example
 
 number = int | float
 
@@ -430,7 +427,7 @@ class NSequence(object):
     def nearest_entry(
         self,
         term_neighbor: Any,
-        inversion_technic: bool,
+        inversion_technic= True,
         starting_position=None,
         iter_limit=None,
         prefer_left_term=True,
@@ -473,6 +470,7 @@ class NSequence(object):
         else:
             try:
                 nearest_term_index, nearest_term = (
+                    #
                     self.__naively_get_sequence_nearest_entry(
                         term_neighbor,
                         starting_position=starting_position,
@@ -482,7 +480,7 @@ class NSequence(object):
                 )
             except (TypeError, ValueError, ArithmeticError) as exc:
                 raise NotImplementedError(
-                    f"Failed to compute the `nearest_entry` for {term_neighbor}"
+                    f"Failed to compute the `nearest_entry` for {term_neighbor} "
                     "May be you should override the default `nearest_entry` implementation."
                 ) from exc
         return nearest_term_index, nearest_term

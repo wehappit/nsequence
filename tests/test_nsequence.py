@@ -1,8 +1,8 @@
 import unittest
 import pytest
 
-from ..nsequence.nsequence import NSequence
-from ..nsequence.exceptions import (
+from nsequence.nsequence import NSequence
+from nsequence.exceptions import (
     ArityMismatchError,
     UnexpectedIndexError,
     UnexpectedPositionError,
@@ -688,6 +688,20 @@ class TestNearestEntryComputation(unittest.TestCase):
 
         # When the term is not an entry of the sequence
         self.assertEqual(sequence.nearest_entry(30, inversion_technic=False), (2, 25))
+
+    def test_should_nearest_entry_naive_computation_should_fail_if_bad_sequence_function_returns_bad_datatype(self):
+        sequence = NSequence(
+            func=lambda x: "II",
+        )
+
+        with pytest.raises(NotImplementedError) as exc:
+            self.assertEqual(sequence.nearest_entry(25, inversion_technic=False), (2, 25))
+
+        self.assertEqual(
+            exc.value.args[0],
+            "Failed to compute the `nearest_entry` for 25 "
+            "May be you should override the default `nearest_entry` implementation."
+        )
 
     def test_should_compute_nearest_entry_inversely_if_param_activated(self):
         sequence = NSequence(
