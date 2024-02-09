@@ -17,8 +17,46 @@ term represents a distinct instance of the scheduled event reminder.
 Consider an event requiring reminders every `F` hours starting from a date `D`. 
 We can establish a direct mathematical relationship between 
 each reminder instance and its timing. Specifically, the reminder function 
-is defined as `R(x) = D + F*x`, where `x` represents the sequence's term or 
-the reminder instance number. With that formula, NSequence can be used as follows to ensure ....
+is defined as `R(n) = D + F*x`, where `R(n)` represents the `n-th` reminder date or the `n-th` reminder if we can say that.
+
+With that formula, NSequence can be used as follows to ensure e
+
+```python
+
+from datetime import datetime, timedelta
+from nsequence import NSequence
+
+# Define start date and frequency in hours
+start_date = datetime(2024, 1, 1)
+frequency_hours = 6
+
+# Define the reminder function using the R(n) formula
+def reminder_func(n):
+    # R(n) = start_date + n * frequency_hours
+    return start_date + timedelta(hours=frequency_hours * (n - 1))
+
+def reminder_inverse_func(remainder_date):
+    return (remainder_date - start_date) / frequency_hours
+
+# Initialize NSequence with the reminder function
+reminder_sequence = NSequence(
+    func=reminder_func, 
+    initial_index=1, 
+    inverse_func=reminder_inverse_func
+)
+
+# Example: Get the 5th reminder date
+fifth_reminder_date = reminder_sequence.nth_term(5)
+print(f"The 5th reminder is scheduled for: {fifth_reminder_date}")
+
+# Example: Get the reminders scheduled between two different dates
+date1 = datetime(2024, 1, 1)
+date2 = datetime(2024, 2, 4)
+
+reminders_between_date1_and_date2 = reminder_sequence.terms_between_terms(date1, date2)
+print(f"The scheduled reminder between {date1} and {date2} are: {fifth_reminder_date}")
+```
+
  This formula efficiently computes the date 
 and time for each reminder, ensuring precise scheduling based on its sequence position.
 
