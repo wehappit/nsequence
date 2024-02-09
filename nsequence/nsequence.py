@@ -14,6 +14,8 @@ from .exceptions import (
 
 # TODO: Doc about funcs monotony and continuity
 # TODO: Fix typing (some funcs should have float / int or float as return type
+# TODO: Use Any for term
+# TODO: Use datetime in readme reallife example
 
 number = int | float
 
@@ -119,8 +121,8 @@ class NSequence(object):
         to the nth term by individually calculating each term's value and summing them up.
 
         Args:
-            n (int): The position up to which the sum is to be calculated. Must be a
-            positive integer.
+            n (int): .The position up to which the sum is to be calculated. Must be a
+            positive integer
 
         Returns:
             number (int or float): The sum of the sequence's terms up to the nth term.
@@ -429,7 +431,7 @@ class NSequence(object):
     def nearest_entry(
         self,
         term_neighbor: float,
-        inversion_technic=bool,
+        inversion_technic: bool,
         starting_position=None,
         iter_limit=None,
         prefer_left_term=True,
