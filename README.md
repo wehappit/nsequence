@@ -236,8 +236,8 @@ This method is meaningful for sequences where a bijective (one-to-one and
 onto) relationship exists between terms and their indices.
 
 #### Parameters
-- `term1` (float): The first term in the sequence.
-- `term2` (float): The second term in the sequence.
+- `term1`: The first term in the sequence.
+- `term2`: The second term in the sequence.
 
 
 ---
