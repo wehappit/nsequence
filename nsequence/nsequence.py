@@ -12,7 +12,7 @@ from .exceptions import (
     IndexNotFoundError,
 )
 
-# TODO: Doc about funcs monotony and continuity
+# DOCME: Doc about functions monotony and continuity impact
 
 number = int | float
 

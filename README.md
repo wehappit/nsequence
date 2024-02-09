@@ -2,7 +2,7 @@
 
 NSequence is a Python library designed for handling progressions or sequences. It allows users to define sequences through functional expressions, and offers capabilities for various computations.
 
-## Real-world Example
+## Real-world Usage Example
 
 Imagine you're developing a complex event reminder system, where specific data _could_ be 
 attached to each reminder. You don't want to save in db, reminders to which the user 
@@ -60,17 +60,17 @@ print(f"The scheduled reminder between {date1} and {date2} are: {scheduled_remin
 # See bellow for more methods available
 ```
 
-NSequence has custom indexing support to hanble more complexe sequence definition.
+**_NSequence has custom indexing support to handle more complex sequence definition.**_
 
 ## Key Features
 
-- **Versatile Sequence Handling**: NSequence supports a wide range of sequence types, including linear, quadratic, cubic, and more. It accommodates both direct and inverse calculations.
+- **Versatile Sequence Handling**: NSequence support every type of sequence, as long as it can be expressed with unary function.
 
 - **Error Handling**: The library includes robust error handling for scenarios such as arity mismatches, unexpected positions or indices, inversion errors, and index not found situations.
 
-- **Custom Indexing**: With NSequence, users can define custom indexing functions to map sequence positions to unique indices, accommodating sequences with non-standard progressions or skipped elements. This feature enhances the library's versatility in sequence management.
+- **Custom Indexing**: Users can define custom indexing functions to map sequence positions to unique indices, accommodating sequences with non-standard progressions or skipped elements. This feature enhances the library's versatility in sequence management.
 
-- **Inverse Functionality**: For invertible sequences, NSequence facilitates finding the index of a given term and vice versa. It provides options for different inversion techniques to suit your specific use case.
+- **Inverse Functionality**: For invertible sequences, NSequence facilitates finding the index of a given term and vice versa and provides various operations based on the inversion. 
 
 - **Nearest Term Search**: NSequence allows you to find the index of the nearest term to a given value in the sequence. It provides flexibility in handling tie-breakers and preferences.
 
@@ -220,8 +220,10 @@ onto) relationship exists between terms and their indices.
 - `term2` (float): The second term in the sequence.
 
 
+---
 
+## Authors
 
-Explore more about NSequence and its capabilities in the [documentation](https://github.com/hjisaac/NSequence).
+- **Isaac Houngue** - [Fasfox](https://fasfox.com)
 
 Feel free to contribute, report issues, or suggest enhancements. Happy sequencing! 📈
