@@ -232,7 +232,7 @@ class TestSumUpToNthTermComputation(unittest.TestCase):
         self.assertIn(
             "Failed to compute the sequence's n first terms sum with the default `sump_up_func`."
             "The default `sump_up_func` implementation seems not appropriate for your use case."
-            "You should provide your own `sum_up_func` implementation.",
+            "You should override the default `sum_up_func` implementation.",
             exc_info.value.args[0],
         )
 

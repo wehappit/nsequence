@@ -34,9 +34,9 @@ class NSequence(object):
     def __init__(
         self,
         *,
-        func: Callable[[int], number],
-        inverse_func: Callable[[number], number] = None,
-        indexing_func: Callable[[int], int] = None,
+        func: Callable[[int], Any],
+        inverse_func: Callable[[Any], number] = None,
+        indexing_func: Callable[[number], number] = None,
         indexing_inverse_func: Callable[[number], number] = None,
         initial_index=None,
     ) -> None:
@@ -89,7 +89,7 @@ class NSequence(object):
             # Set the starting index of the sequence
             self._initial_index = initial_index or self.DEFAULT_INITIAL_INDEX
 
-    def nth_term(self, n: int) -> number:
+    def nth_term(self, n: int) -> Any:
         """
         Computes the nth term of the sequence using a predefined function.
 
@@ -103,29 +103,28 @@ class NSequence(object):
                     a positive integer.
 
         Returns:
-            number: The nth term of the sequence. Can be an int or float, depending
-                    on the sequence.
-
-        Raises:
-            Document exceptions raised by `_func` or `_indexing_func` if known.
+            Any: The nth term of the sequence. It depends on the sequence function.
 
         """
 
         return self._func(self._indexing_func(n))
 
-    def sum_up_to_nth_term(self, n: int) -> number:
+    def sum_up_to_nth_term(self, n: int) -> Any:
         """
         Calculate the sum of the sequence up to the nth term.
 
         This method computes the cumulative sum of the sequence from the first term up
         to the nth term by individually calculating each term's value and summing them up.
 
+        It should be overridden if the return type of the sequence's function does not
+        implement `__add__`.
+
         Args:
             n (int): .The position up to which the sum is to be calculated. Must be a
             positive integer
 
         Returns:
-            number (int or float): The sum of the sequence's terms up to the nth term.
+            Any: The sum of the sequence's terms up to the nth term.
 
         Raises:
             NotImplementedError: If the sum cannot be computed with the default summing function.
@@ -139,7 +138,7 @@ class NSequence(object):
             raise NotImplementedError(
                 "Failed to compute the sequence's n first terms sum with the default `sump_up_func`."
                 "The default `sump_up_func` implementation seems not appropriate for your use case."
-                "You should provide your own `sum_up_func` implementation."
+                "You should override the default `sum_up_func` implementation."
             ) from exc
 
         return sum_to_return
@@ -148,8 +147,8 @@ class NSequence(object):
 
     @functools.lru_cache(maxsize=LRU_CACHE_MAX_SIZE)
     def index_of_term(
-        self, term: float, naive_technic=False, exact_exception=True
-    ) -> int:
+        self, term: Any, naive_technic=False, exact_exception=True
+    ) -> number:
         """
         Finds the index of a given term in the sequence.
 
@@ -158,7 +157,7 @@ class NSequence(object):
         it can optionally use a brute-force approach to find the term's index.
 
         Args:
-            term (float): The sequence term to find the index for.
+            term (Any): The sequence term to find the index for.
             naive_technic (bool): If True and no inverse function is provided,
                                 uses a brute-force search to find the index.
                                 Defaults to False.
@@ -217,7 +216,7 @@ class NSequence(object):
 
         return int(index)
 
-    def count_terms_between_terms(self, term1: float, term2: float) -> int:
+    def count_terms_between_terms(self, term1: Any, term2: Any) -> int:
         """
         Counts the number of terms between two given terms in the sequence, using
         the sequence's inverse function to find their indices.
@@ -226,8 +225,8 @@ class NSequence(object):
         onto) relationship exists between terms and their indices.
 
         Parameters:
-        - term1 (float): The first term in the sequence.
-        - term2 (float): The second term in the sequence.
+        - term1 (Any): The first term in the sequence.
+        - term2 (Any): The second term in the sequence.
 
         Returns:
         - int: The number of terms between `term1` and `term2`, exclusive.
@@ -282,7 +281,7 @@ class NSequence(object):
 
         return self.__count_positions_between(index1_position, index2_position)
 
-    def terms_between_terms(self, term1: float, term2: float):
+    def terms_between_terms(self, term1: Any, term2: Any):
         """
         Returns the terms located between two given terms in the sequence.
 
@@ -290,8 +289,8 @@ class NSequence(object):
         respective indices, then retrieves all terms between these indices.
 
         Parameters:
-        - term1 (float): The first term in the sequence.
-        - term2 (float): The second term in the sequence.
+        - term1 (Any): The first term in the sequence.
+        - term2 (Any): The second term in the sequence.
 
         Returns:
         - A list of terms between `term1` and `term2`.
@@ -324,7 +323,7 @@ class NSequence(object):
         - index2 (int): The second index.
 
         Returns:
-        - list[number]: A list of terms between the two indices, inclusive.
+        - list[Any]: A list of terms between the two indices, inclusive.
         """
         index1 = min(index1, index2)
         index2 = max(index1, index2)
@@ -339,7 +338,7 @@ class NSequence(object):
 
     def nearest_term_index(
         self,
-        term_neighbor: float,
+        term_neighbor: Any,
         inversion_technic=True,
         starting_position=None,
         iter_limit=None,
@@ -356,7 +355,7 @@ class NSequence(object):
         when two are equally distant from `term_neighbor`.
 
         Parameters:
-            term_neighbor (float): The value to find the nearest sequence term to.
+            term_neighbor (Any): The value to find the nearest sequence term to.
             inversion_technic (bool): If True, uses inversion for efficient search.
             starting_position (int): Starting point for the search (ignored if
                                     `inversion_technic` is True).
@@ -384,7 +383,7 @@ class NSequence(object):
 
     def nearest_term(
         self,
-        term_neighbor: float,
+        term_neighbor: Any,
         inversion_technic=True,
         starting_position=None,
         iter_limit=None,
@@ -401,7 +400,7 @@ class NSequence(object):
         (if False) is selected as the nearest.
 
         Parameters:
-            term_neighbor (float): The value to find the nearest sequence term for.
+            term_neighbor (Any): The value to find the nearest sequence term for.
             inversion_technic (bool): If True, uses the inversion technique for finding
                                     the nearest term, otherwise uses iterative search.
             starting_position (int): The starting position for iterative search, ignored
@@ -412,7 +411,7 @@ class NSequence(object):
                                     equidistant terms from `term_neighbor`.
 
         Returns:
-            number: The term in the sequence nearest to the specified `term_neighbor`.
+            Any: The term in the sequence nearest to the specified `term_neighbor`.
         """
 
         iter_limit = iter_limit or self.MAX_BRUTE_FORCE_ITERATION
@@ -430,7 +429,7 @@ class NSequence(object):
 
     def nearest_entry(
         self,
-        term_neighbor: float,
+        term_neighbor: Any,
         inversion_technic: bool,
         starting_position=None,
         iter_limit=None,
@@ -441,14 +440,14 @@ class NSequence(object):
         an inversion technique or a naive search approach.
 
         Parameters:
-        - term_neighbor (float): The term to find the nearest for.
+        - term_neighbor (Any): The term to find the nearest for.
         - inversion_technic (bool): If True, uses inversion function for finding
         the nearest term. If False, performs a naive search. Default is True.
         - starting_position (int): The starting position for the naive search.
         Ignored if inversion_technic is True. Default is 1.
         - iter_limit (int): The iteration limit for the naive search. Ignored if
         inversion_technic is True. Default is MAX_BRUTE_FORCE_ITERATION.
-        - prefer_left_term (bool): Preference for the left nearest term if distances
+        - prefer_left_term (bool): Preference for the left the nearest term if distances
         are equal. Default is True.
 
         Returns:
@@ -472,14 +471,20 @@ class NSequence(object):
                 )
             )
         else:
-            nearest_term_index, nearest_term = (
-                self.__naively_get_sequence_nearest_entry(
-                    term_neighbor,
-                    starting_position=starting_position,
-                    iter_limit=iter_limit,
-                    prefer_left_term=prefer_left_term,
+            try:
+                nearest_term_index, nearest_term = (
+                    self.__naively_get_sequence_nearest_entry(
+                        term_neighbor,
+                        starting_position=starting_position,
+                        iter_limit=iter_limit,
+                        prefer_left_term=prefer_left_term,
+                    )
                 )
-            )
+            except (TypeError, ValueError, ArithmeticError) as exc:
+                raise NotImplementedError(
+                    f"Failed to compute the `nearest_entry` for {term_neighbor}"
+                    "May be you should override the default `nearest_entry` implementation."
+                ) from exc
         return nearest_term_index, nearest_term
 
     @functools.lru_cache(maxsize=LRU_CACHE_MAX_SIZE)
@@ -521,12 +526,12 @@ class NSequence(object):
     # PROPERTIES
 
     @property
-    def initial_index(self) -> float:
+    def initial_index(self) -> int:
         """The initial index provided while creating the sequence."""
         return self._initial_index
 
     @property
-    def initial_term(self) -> float:
+    def initial_term(self) -> Any:
         """The initial term of the sequence."""
         return self._func(self._initial_index)
 
@@ -545,16 +550,17 @@ class NSequence(object):
     @functools.lru_cache(maxsize=LRU_CACHE_MAX_SIZE)
     def __naively_get_sequence_nearest_entry(
         self,
-        term_neighbor: float,
+        term_neighbor: Any,
         starting_position=None,
         iter_limit=None,
         prefer_left_term=True,
     ):
+        # This implementation makes sens only if the return type of the sequence's function is a float
         """
         Finds the sequence entry nearest to a given term, using a naive approach.
 
         Parameters:
-        - term_neighbor (float): The term to find the nearest neighbor for.
+        - term_neighbor (Any): The term to find the nearest neighbor for.
         - starting_position (int, optional): The sequence position to start searching from. Defaults to 1.
         - iter_limit (int, optional): The maximum number of terms to consider in the search. Defaults to 1000.
         - prefer_left_term (bool, optional): Whether to prefer the leftmost term in case of ties. Defaults to True.
@@ -598,7 +604,7 @@ class NSequence(object):
     @functools.lru_cache(maxsize=LRU_CACHE_MAX_SIZE)
     def __inversely_get_sequence_nearest_entry(
         self,
-        term_neighbor: float,
+        term_neighbor: Any,
         prefer_left_term=True,
     ) -> tuple[int, number]:
         """
@@ -609,7 +615,7 @@ class NSequence(object):
         actual term in the sequence.
 
         Parameters:
-        - term_neighbor (float): The term to find the nearest neighbor for.
+        - term_neighbor (Any): The term to find the nearest neighbor for.
         - prefer_left_term (bool, optional): Prefers the left term in case of equal
         distances. Defaults to True.
 
