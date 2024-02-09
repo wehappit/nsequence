@@ -2,65 +2,6 @@
 
 NSequence is a Python library designed for handling progressions or sequences. It allows users to define sequences through functional expressions, and offers capabilities for various computations.
 
-## Real-world Usage Example
-
-Imagine you're developing a complex event reminder system, where specific data _could_ be 
-attached to each reminder. You don't want to save in db, reminders to which the user 
-hasn't attached any specific data (you're seeing it as resource waste). But, for forecasting and
-planning purposes, you want to be able to retrieve 
-for a given event recall data (or metadata inferred from the related event) for a 
-given period in the past (or future).
-
-The reminder system can be conceptualized as a mathematical sequence, where each 
-term represents a distinct instance of the scheduled event reminder.
-
-Consider an event requiring reminders every `F` hours starting from a date `D`. 
-We can establish a direct mathematical relationship between 
-each reminder instance and its timing. Specifically, the reminder function 
-is defined as `R(n) = D + F*x`, where `R(n)` represents the `n-th` reminder 
-date or the `n-th` reminder if we can say that.
-
-NSequence then be used to make your code shine with the versatile methods available
-
-```python
-
-from datetime import datetime, timedelta
-from nsequence import NSequence
-
-# Define start date and frequency in hours
-start_date = datetime(2024, 1, 1)
-frequency_hours = 2
-
-# Define the reminder function using the R(n) formula
-def reminder_func(n):
-    # R(n) = start_date + n * frequency_hours
-    return start_date + timedelta(hours=frequency_hours * (n - 1))
-
-def reminder_inverse_func(reminder_date):
-    return (reminder_date - start_date) / frequency_hours
-
-# Initialize NSequence with the reminder function
-reminder_sequence = NSequence(
-    func=reminder_func, 
-    initial_index=1, 
-    inverse_func=reminder_inverse_func
-)
-
-# Example: Get the 5th reminder date
-fifth_reminder_date = reminder_sequence.nth_term(5)
-print(f"The 5th reminder is scheduled for: {fifth_reminder_date}")
-
-# Example: Get the reminders scheduled between two different dates
-date1 = datetime(2024, 1, 1)
-date2 = datetime(2024, 2, 4)
-
-scheduled_reminders_between_dates = reminder_sequence.terms_between_terms(date1, date2)
-print(f"The scheduled reminder between {date1} and {date2} are: {scheduled_reminders_between_dates}")
-
-# See bellow for more methods available
-```
-
-**_NSequence has custom indexing support to handle more complex sequence definition.**_
 
 ## Key Features
 
@@ -137,7 +78,65 @@ index_of_8 = invertible_sequence.index_of_term(8)
 terms_between_5_and_10 = invertible_sequence.terms_between_indices(5, 10)
 ```
 
+## Real-world Usage Example
 
+Imagine you're developing a complex event reminder system, where specific data _could_ be 
+attached to each reminder. You don't want to save in db, reminders to which the user 
+hasn't attached any specific data (you're seeing it as resource waste). But, for forecasting and
+planning purposes, you want to be able to retrieve 
+for a given event recall data (or metadata inferred from the related event) for a 
+given period in the past (or future).
+
+The reminder system can be conceptualized as a mathematical sequence, where each 
+term represents a distinct instance of the scheduled event reminder.
+
+Consider an event requiring reminders every `F` hours starting from a date `D`. 
+We can establish a direct mathematical relationship between 
+each reminder instance and its timing. Specifically, the reminder function 
+is defined as `R(n) = D + F*x`, where `R(n)` represents the `n-th` reminder 
+date.
+
+NSequence then be used to make your code shine with the versatile methods available
+
+```python
+
+from datetime import datetime, timedelta
+from nsequence import NSequence
+
+# Define start date and frequency in hours
+start_date = datetime(2024, 1, 1)
+frequency_hours = 2
+
+# Define the reminder function using the R(n) formula
+def reminder_func(n):
+    # R(n) = start_date + n * frequency_hours
+    return start_date + timedelta(hours=frequency_hours * (n - 1))
+
+def reminder_inverse_func(reminder_date):
+    return (reminder_date - start_date) / frequency_hours
+
+# Initialize NSequence with the reminder function
+reminder_sequence = NSequence(
+    func=reminder_func, 
+    initial_index=1, 
+    inverse_func=reminder_inverse_func
+)
+
+# Example: Get the 5th reminder date
+fifth_reminder_date = reminder_sequence.nth_term(5)
+print(f"The 5th reminder is scheduled for: {fifth_reminder_date}")
+
+# Example: Get the reminders scheduled between two different dates
+date1 = datetime(2024, 1, 1)
+date2 = datetime(2024, 2, 4)
+
+scheduled_reminders_between_dates = reminder_sequence.terms_between_terms(date1, date2)
+print(f"The scheduled reminder between {date1} and {date2} are: {scheduled_reminders_between_dates}")
+
+# See bellow for more methods available
+```
+
+**NSequence has custom indexing support to handle more complex sequence definition.**
 
 ## Key Methods
 
@@ -158,7 +157,7 @@ Create a sequence instance
 - `initial_index`: The starting index for the sequence. This parameter is ignored if `indexing_func` is provided, as the initial index will then be derived from the indexing function.
 
 ### `nth_term`
-Returns the sequence term at the given position
+Compute the sequence term at the given position
 
 #### Parameters
 - `position`: Position in the sequence to calculate the term for.
@@ -187,19 +186,40 @@ Finds the nearest sequence entry (both the index and the term) to a given term.
 - `iter_limit`: The maximum number of iterations for the search (ignored if `inversion_technic` is True).
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
+### `nearest_term_index`
+Finds the index of the nearest term to a given value in the sequence
+
+#### Parameters
+- `term_neighbor`: The value to find the nearest sequence term to.
+- `inversion_technic`: Whether to use the inversion technique for finding the nearest term.
+- `starting_position`: The starting position for the iterative search (ignored if `inversion_technic` is True).
+- `iter_limit`: The maximum number of iterations for the search (ignored if `inversion_technic` is True).
+- `prefer_left_term`: Preference for the left term in case of equidistant terms.
+
+### `nearest_term`
+Retrieves the term in the sequence that is nearest to a specified value.
+
+#### Parameters
+- `term_neighbor`: The value to find the nearest sequence term for.
+- `inversion_technic`: Whether to use the inversion technique for finding the nearest term.
+- `starting_position`: The starting position for the iterative search (ignored if `inversion_technic` is True).
+- `iter_limit`: The maximum number of iterations for the search (ignored if `inversion_technic` is True).
+- `prefer_left_term`: Preference for the left term in case of equidistant terms.
+
+
 ### `terms_between_terms`
-Returns a list of sequence terms located between two given terms, inclusive.
+Compute a list of sequence terms located between two given terms, inclusive.
 
 #### Parameters
 - `term1`: The first term.
 - `term2`: The second term.
 
 ### `sum_up_to_nth_term`
-Calculate the sum of the sequence up to the nth term.
+Calculate the sum of the sequence up to the nth term. 
 
 #### Parameters
 - `n`: The position up to which the sum is to be calculated. Must be a positive integer.
-- 
+
 ### `index_of_term`
 Returns the sum of the sequence up to the nth term.
 
