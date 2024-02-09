@@ -15,6 +15,7 @@ from .exceptions import (
 # TODO: Doc about funcs monotony and continuity
 # TODO: Fix typing (some funcs should have float / int or float as return type
 # TODO: Use Any for term
+# TODO: Use datetime in readme reallife example
 
 number = int | float
 
