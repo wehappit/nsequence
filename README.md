@@ -13,18 +13,14 @@ given period in the past (or future).
 
 The reminder system can be conceptualized as a mathematical sequence, where each 
 term represents a distinct instance of the scheduled event reminder.
-Consider an event that needs to be reminded every ff hours starting 
-from a specific date dd; this scheduling pattern can be mathematically 
-modelled and managed using the NSequence library. In this context, the 
-func parameter of NSequence is instrumental in defining the mathematical 
-relationship between the sequence terms (each reminder instance) and their occurrences in time.
 
-To illustrate, if an event is to be reminded every ff hours starting from a 
-date dd, the reminder function could be expressed as R(n)=d+nfR(n)=d+nf, 
-where nn is the nn-th term of the sequence (or the nn-th reminder instance), 
-dd is the starting point (initial date and time), and ff is the frequency 
-in hours. This function effectively calculates the date and time for each 
-subsequent reminder based on its position in the sequence.
+Consider an event requiring reminders every `F` hours starting from a date `D`. 
+Using the NSequence library, this pattern can be succinctly modeled with the 
+func parameter, which establishes a direct mathematical relationship between 
+each reminder instance and its timing. Specifically, the reminder function 
+is defined as `R(x) = D + F*x`, where `x` represents the sequence's term or 
+the reminder instance number. This formula efficiently computes the date 
+and time for each reminder, ensuring precise scheduling based on its sequence position.
 
 ## Key Features
 
