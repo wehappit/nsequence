@@ -1,6 +1,6 @@
 # NSequence
 
-NSequence is a Python library designed for handling progressions or sequences, offering various functions and utilities for working with sequences. It allows users to define sequences through functional expressions, offering capabilities for various computations.
+NSequence is a Python library designed for handling progressions or sequences. It allows users to define sequences through functional expressions, and offers capabilities for various computations.
 
 ## Real-world Example
 
@@ -20,7 +20,7 @@ each reminder instance and its timing. Specifically, the reminder function
 is defined as `R(n) = D + F*x`, where `R(n)` represents the `n-th` reminder 
 date or the `n-th` reminder if we can say that.
 
-With that formula, NSequence can be used as follows to ensure e
+NSequence then be used to make your code shine with the versatile methods available
 
 ```python
 
