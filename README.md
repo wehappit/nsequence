@@ -29,7 +29,7 @@ from nsequence import NSequence
 
 # Define start date and frequency in hours
 start_date = datetime(2024, 1, 1)
-frequency_hours = 6
+frequency_hours = 2
 
 # Define the reminder function using the R(n) formula
 def reminder_func(n):
