@@ -103,11 +103,7 @@ class NSequence(object):
                     a positive integer.
 
         Returns:
-            number: The nth term of the sequence. Can be an int or float, depending
-                    on the sequence.
-
-        Raises:
-            Document exceptions raised by `_func` or `_indexing_func` if known.
+            Any: The nth term of the sequence. It depends on the sequence function.
 
         """
 
@@ -128,7 +124,7 @@ class NSequence(object):
             positive integer
 
         Returns:
-            number (int or float): The sum of the sequence's terms up to the nth term.
+            Any: The sum of the sequence's terms up to the nth term.
 
         Raises:
             NotImplementedError: If the sum cannot be computed with the default summing function.
@@ -151,7 +147,7 @@ class NSequence(object):
 
     @functools.lru_cache(maxsize=LRU_CACHE_MAX_SIZE)
     def index_of_term(
-        self, term: float, naive_technic=False, exact_exception=True
+        self, term: Any, naive_technic=False, exact_exception=True
     ) -> number:
         """
         Finds the index of a given term in the sequence.
@@ -161,7 +157,7 @@ class NSequence(object):
         it can optionally use a brute-force approach to find the term's index.
 
         Args:
-            term (float): The sequence term to find the index for.
+            term (Any): The sequence term to find the index for.
             naive_technic (bool): If True and no inverse function is provided,
                                 uses a brute-force search to find the index.
                                 Defaults to False.
@@ -229,8 +225,8 @@ class NSequence(object):
         onto) relationship exists between terms and their indices.
 
         Parameters:
-        - term1 (float): The first term in the sequence.
-        - term2 (float): The second term in the sequence.
+        - term1 (Any): The first term in the sequence.
+        - term2 (Any): The second term in the sequence.
 
         Returns:
         - int: The number of terms between `term1` and `term2`, exclusive.
@@ -293,8 +289,8 @@ class NSequence(object):
         respective indices, then retrieves all terms between these indices.
 
         Parameters:
-        - term1 (float): The first term in the sequence.
-        - term2 (float): The second term in the sequence.
+        - term1 (Any): The first term in the sequence.
+        - term2 (Any): The second term in the sequence.
 
         Returns:
         - A list of terms between `term1` and `term2`.
@@ -530,12 +526,12 @@ class NSequence(object):
     # PROPERTIES
 
     @property
-    def initial_index(self) -> float:
+    def initial_index(self) -> int:
         """The initial index provided while creating the sequence."""
         return self._initial_index
 
     @property
-    def initial_term(self) -> float:
+    def initial_term(self) -> Any:
         """The initial term of the sequence."""
         return self._func(self._initial_index)
 
@@ -554,11 +550,12 @@ class NSequence(object):
     @functools.lru_cache(maxsize=LRU_CACHE_MAX_SIZE)
     def __naively_get_sequence_nearest_entry(
         self,
-        term_neighbor: float,
+        term_neighbor: Any,
         starting_position=None,
         iter_limit=None,
         prefer_left_term=True,
     ):
+        # This implementation makes sens only if the return type of the sequence's function is a float
         """
         Finds the sequence entry nearest to a given term, using a naive approach.
 
@@ -607,7 +604,7 @@ class NSequence(object):
     @functools.lru_cache(maxsize=LRU_CACHE_MAX_SIZE)
     def __inversely_get_sequence_nearest_entry(
         self,
-        term_neighbor: float,
+        term_neighbor: Any,
         prefer_left_term=True,
     ) -> tuple[int, number]:
         """
@@ -618,7 +615,7 @@ class NSequence(object):
         actual term in the sequence.
 
         Parameters:
-        - term_neighbor (float): The term to find the nearest neighbor for.
+        - term_neighbor (Any): The term to find the nearest neighbor for.
         - prefer_left_term (bool, optional): Prefers the left term in case of equal
         distances. Defaults to True.
 
