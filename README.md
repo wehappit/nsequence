@@ -57,14 +57,15 @@ scheduled_reminders_dates = reminder_sequence.terms_between_terms(date1, date2)
 print(f"The scheduled reminder between {date1} and {date2} are: {scheduled_reminders_dates}")
 ```
 
- This formula efficiently computes the date 
-and time for each reminder, ensuring precise scheduling based on its sequence position.
+NSequence has custom indexing support to hanble more complexe sequence definition.
 
 ## Key Features
 
 - **Versatile Sequence Handling**: NSequence supports a wide range of sequence types, including linear, quadratic, cubic, and more. It accommodates both direct and inverse calculations.
 
 - **Error Handling**: The library includes robust error handling for scenarios such as arity mismatches, unexpected positions or indices, inversion errors, and index not found situations.
+
+- **Custom Indexing**: NSequence allows you to find the index of the nearest term to a given value in the sequence. It provides flexibility in handling tie-breakers and preferences.
 
 - **Inverse Functionality**: For invertible sequences, NSequence facilitates finding the index of a given term and vice versa. It provides options for different inversion techniques to suit your specific use case.
 
