@@ -54,8 +54,10 @@ print(f"The 5th reminder is scheduled for: {fifth_reminder_date}")
 date1 = datetime(2024, 1, 1)
 date2 = datetime(2024, 2, 4)
 
-scheduled_reminders_dates = reminder_sequence.terms_between_terms(date1, date2)
-print(f"The scheduled reminder between {date1} and {date2} are: {scheduled_reminders_dates}")
+scheduled_reminders_between_dates = reminder_sequence.terms_between_terms(date1, date2)
+print(f"The scheduled reminder between {date1} and {date2} are: {scheduled_reminders_between_dates}")
+
+# See bellow for more methods available
 ```
 
 NSequence has custom indexing support to hanble more complexe sequence definition.
