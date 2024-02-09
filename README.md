@@ -17,7 +17,8 @@ term represents a distinct instance of the scheduled event reminder.
 Consider an event requiring reminders every `F` hours starting from a date `D`. 
 We can establish a direct mathematical relationship between 
 each reminder instance and its timing. Specifically, the reminder function 
-is defined as `R(n) = D + F*x`, where `R(n)` represents the `n-th` reminder date or the `n-th` reminder if we can say that.
+is defined as `R(n) = D + F*x`, where `R(n)` represents the `n-th` reminder 
+date or the `n-th` reminder if we can say that.
 
 With that formula, NSequence can be used as follows to ensure e
 

@@ -429,7 +429,7 @@ class NSequence(object):
     def nearest_entry(
         self,
         term_neighbor: float,
-        inversion_technic=bool,
+        inversion_technic: bool,
         starting_position=None,
         iter_limit=None,
         prefer_left_term=True,
