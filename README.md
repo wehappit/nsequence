@@ -5,9 +5,9 @@ NSequence is a Python library designed for handling progressions or sequences, o
 ## Real-world Example
 
 Imagine you're developing a complex event reminder system, where specific data _could_ be 
-attached to each reminder. You don't want to just be creating reminder instances 
-in the DB (resource waste) if the user does not attach any specific data to a particular 
-reminder. But, for forecasting and planning purposes, you want to be able to retrieve 
+attached to each reminder. You don't want to save in db, reminders to which the user 
+hasn't attached any specific data (you're seeing it as resource waste). But, for forecasting and
+planning purposes, you want to be able to retrieve 
 for a given event recall data (or metadata inferred from the related event) for a 
 given period in the past (or future).
 
@@ -15,11 +15,11 @@ The reminder system can be conceptualized as a mathematical sequence, where each
 term represents a distinct instance of the scheduled event reminder.
 
 Consider an event requiring reminders every `F` hours starting from a date `D`. 
-Using the NSequence library, this pattern can be succinctly modeled with the 
-func parameter, which establishes a direct mathematical relationship between 
+We can establish a direct mathematical relationship between 
 each reminder instance and its timing. Specifically, the reminder function 
 is defined as `R(x) = D + F*x`, where `x` represents the sequence's term or 
-the reminder instance number. This formula efficiently computes the date 
+the reminder instance number. With that formula, NSequence can be used as follows to ensure ....
+ This formula efficiently computes the date 
 and time for each reminder, ensuring precise scheduling based on its sequence position.
 
 ## Key Features
