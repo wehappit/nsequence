@@ -35,8 +35,8 @@ def reminder_func(n):
     # R(n) = start_date + n * frequency_hours
     return start_date + timedelta(hours=frequency_hours * (n - 1))
 
-def reminder_inverse_func(remainder_date):
-    return (remainder_date - start_date) / frequency_hours
+def reminder_inverse_func(reminder_date):
+    return (reminder_date - start_date) / frequency_hours
 
 # Initialize NSequence with the reminder function
 reminder_sequence = NSequence(
@@ -53,8 +53,8 @@ print(f"The 5th reminder is scheduled for: {fifth_reminder_date}")
 date1 = datetime(2024, 1, 1)
 date2 = datetime(2024, 2, 4)
 
-reminders_between_date1_and_date2 = reminder_sequence.terms_between_terms(date1, date2)
-print(f"The scheduled reminder between {date1} and {date2} are: {fifth_reminder_date}")
+scheduled_reminders_dates = reminder_sequence.terms_between_terms(date1, date2)
+print(f"The scheduled reminder between {date1} and {date2} are: {scheduled_reminders_dates}")
 ```
 
  This formula efficiently computes the date 
