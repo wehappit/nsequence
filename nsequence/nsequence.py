@@ -553,7 +553,6 @@ class NSequence(object):
         iter_limit=None,
         prefer_left_term=True,
     ):
-        # This implementation makes sens only if the return type of the sequence's function is a float
         """
         Finds the sequence entry nearest to a given term, using a naive approach.
 
@@ -561,7 +560,7 @@ class NSequence(object):
         - term_neighbor (Any): The term to find the nearest neighbor for.
         - starting_position (int, optional): The sequence position to start searching from. Defaults to 1.
         - iter_limit (int, optional): The maximum number of terms to consider in the search. Defaults to 1000.
-        - prefer_left_term (bool, optional): Whether to prefer the leftmost term in case of ties. Defaults to True.
+        - prefer_left_term (bool, optional): Whether to prefer the left term. Defaults to True.
 
         Returns:
         - A tuple (nearest_term_index, nearest_term) representing the index and value of the nearest term found.
@@ -570,6 +569,8 @@ class NSequence(object):
         and updating the nearest term accordingly. It's optimized for sequences where terms are not sorted or
         where no faster lookup method is available.
         """
+
+        # This implementation makes sens only if the return type of the sequence's function is a float
 
         iter_limit = iter_limit or self.MAX_BRUTE_FORCE_ITERATION
         starting_position = starting_position or self.INITIAL_POSITION
