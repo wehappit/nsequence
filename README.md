@@ -177,7 +177,7 @@ Determines the sequence position of a given index, useful when custom indexing i
 - `index`: The index for which to find the corresponding sequence position.
 
 #### Raises
-- `IndexNotFoundError`: If the user provides custom indexing function and the index is not found within the bounds set by `NSequence.POSITION_LIMIT` 
+- `IndexNotFoundError`: Raised if the user provides custom indexing function and the index is not found within the bounds set by `NSequence.POSITION_LIMIT` 
 
 ### `nearest_entry`
 Finds the nearest sequence entry (both the index and the term) to a given term.
@@ -190,7 +190,7 @@ Finds the nearest sequence entry (both the index and the term) to a given term.
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
 #### Raises
-- `NotImplementedError`: If the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
+- `NotImplementedError`: Raised if the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
 
 ### `nearest_term_index`
 Finds the index of the nearest term to a given value in the sequence
@@ -203,7 +203,7 @@ Finds the index of the nearest term to a given value in the sequence
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
 #### Raises
-- `NotImplementedError`: If the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
+- `NotImplementedError`: Raised if the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
 
 ### `nearest_term`
 Retrieves the term in the sequence that is nearest to a specified value.
@@ -216,7 +216,7 @@ Retrieves the term in the sequence that is nearest to a specified value.
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
 #### Raises
-- `NotImplementedError`: If the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
+- `NotImplementedError`: Raised if the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
 
 ### `terms_between_terms`
 Compute a list of sequence terms located between two given terms, inclusive.
@@ -226,8 +226,8 @@ Compute a list of sequence terms located between two given terms, inclusive.
 - `term2`: The second term.
 
 #### Raises:
-- `InversionError`: If `inverse_func` is not defined.
-- `ValueError`: If calculated indices are not valid or if `term1_index` or
+- `InversionError`: Raised if `inverse_func` is not defined.
+- `ValueError`: Raised if calculated indices are not valid or if `term1_index` or
 `term2_index` are not integers.
 
 ### `sum_up_to_nth_term`
@@ -245,8 +245,8 @@ Returns the sum of the sequence up to the nth term.
 - `exact_exception`:  If True, raises an exception if the term does not exactly match any sequence term. Defaults to True.
 
 #### Raises:
-- `InversionError`: If `naive_technic` is False and no inverse function is provided.
-- `ValueError`: If `exact_exception` is True and the term is not found.
+- `InversionError`: Raised if `naive_technic` is False and no inverse function is provided.
+- `ValueError`: Raised if `exact_exception` is True and the term is not found.
 
 ### `count_terms_between_indices`
 Counts the number of terms between two indices in the sequence.
@@ -268,7 +268,7 @@ onto) relationship exists between terms and their indices.
 - `term2`: The second term in the sequence.
 
 #### Raises:
-- `InversionError`: If an inverse function has not been defined or is not
+- `InversionError`: Raised if an inverse function has not been defined or is not
 applicable, indicating that term indices cannot be accurately determined.
 
 
