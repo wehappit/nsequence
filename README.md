@@ -136,7 +136,10 @@ print(f"The scheduled reminder between {date1} and {date2} are: {scheduled_remin
 # See bellow for more methods available
 ```
 
-**NSequence has custom indexing support to handle more complex sequence definition.**
+- **NSequence has custom indexing support to handle more complex sequence definition.**
+
+**You can use inheritance to override the default methods if the default implementation does not suit your needs
+especially in the cases where the return type of the sequence's function is not a float**
 
 ## Key Methods
 
