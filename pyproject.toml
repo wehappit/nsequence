@@ -1,4 +1,4 @@
-[tool.poetry]
+[project]
 name = "nsequence"
 version = "0.1.0"
 description = "A Library for Manipulating Progressions or Sequences"
@@ -20,7 +20,10 @@ requires-python = ">=3.9"
 dev = ["black", "bumpver", "pip-tools", "pytest"]
 
 [project.urls]
-Homepage = "https://github.com/wehappit/nsequence"
+homepage = "https://github.com/wehappit/nsequence"
+documentation = "https://github.com/wehappit/nsequence"
+repository = "https://github.com/wehappit/nsequence"
+changelog = "https://github.com/wehappit/nsequence/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["setuptools>=61.0.0", "wheel"]
