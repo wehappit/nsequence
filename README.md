@@ -78,7 +78,7 @@ index_of_8 = invertible_sequence.index_of_term(8)
 terms_between_5_and_10 = invertible_sequence.terms_between_indices(5, 10)
 ```
 
-## Real-world Usage Example
+## Real-world Usage
 
 Imagine you're developing a complex event reminder system, where specific data _could_ be 
 attached to each reminder. You don't want to save in db, reminders to which the user 
@@ -93,10 +93,10 @@ term represents a distinct instance of the scheduled event reminder.
 Consider an event requiring reminders every `F` hours starting from a date `D`. 
 We can establish a direct mathematical relationship between 
 each reminder instance and its timing. Specifically, the reminder function 
-is defined as `R(n) = D + F*x`, where `R(n)` represents the `n-th` reminder 
+is defined as `R(n) = D + F*n`, where `R(n)` represents the `n-th` reminder 
 date.
 
-NSequence then be used to make your code shine with the versatile methods available
+NSequence then be used to make your code shine with the methods available.
 
 ```python
 
@@ -159,6 +159,10 @@ Create a sequence instance
 
 - `initial_index`: The starting index for the sequence. This parameter is ignored if `indexing_func` is provided, as the initial index will then be derived from the indexing function.
 
+#### Raises
+- `ArityMismatchError`: Raised if the provided function does not accept exactly one argument.
+- `TypeError`: Raised if the provided argument is not a callable function.
+
 ### `nth_term`
 Compute the sequence term at the given position
 
@@ -172,12 +176,8 @@ Determines the sequence position of a given index, useful when custom indexing i
 #### Parameters
 - `index`: The index for which to find the corresponding sequence position.
 
-### `count_terms_between_indices`
-Counts the number of terms between two indices in the sequence.
-
-#### Parameters
-- `index1`: The starting index.
-- `index2`: The ending index.
+#### Raises
+- `IndexNotFoundError`: Raised if the user provides custom indexing function and the index is not found within the bounds set by `NSequence.POSITION_LIMIT` 
 
 ### `nearest_entry`
 Finds the nearest sequence entry (both the index and the term) to a given term.
@@ -189,6 +189,9 @@ Finds the nearest sequence entry (both the index and the term) to a given term.
 - `iter_limit`: The maximum number of iterations for the search (ignored if `inversion_technic` is True).
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
+#### Raises
+- `NotImplementedError`: Raised if the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
+
 ### `nearest_term_index`
 Finds the index of the nearest term to a given value in the sequence
 
@@ -198,6 +201,9 @@ Finds the index of the nearest term to a given value in the sequence
 - `starting_position`: The starting position for the iterative search (ignored if `inversion_technic` is True).
 - `iter_limit`: The maximum number of iterations for the search (ignored if `inversion_technic` is True).
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
+
+#### Raises
+- `NotImplementedError`: Raised if the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
 
 ### `nearest_term`
 Retrieves the term in the sequence that is nearest to a specified value.
@@ -209,6 +215,8 @@ Retrieves the term in the sequence that is nearest to a specified value.
 - `iter_limit`: The maximum number of iterations for the search (ignored if `inversion_technic` is True).
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
+#### Raises
+- `NotImplementedError`: Raised if the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
 
 ### `terms_between_terms`
 Compute a list of sequence terms located between two given terms, inclusive.
@@ -216,6 +224,11 @@ Compute a list of sequence terms located between two given terms, inclusive.
 #### Parameters
 - `term1`: The first term.
 - `term2`: The second term.
+
+#### Raises
+- `InversionError`: Raised if `inverse_func` is not defined.
+- `ValueError`: Raised if calculated indices are not valid or if `term1_index` or
+`term2_index` are not integers.
 
 ### `sum_up_to_nth_term`
 Calculate the sum of the sequence up to the nth term. 
@@ -231,9 +244,21 @@ Returns the sum of the sequence up to the nth term.
 - `naive_technic`: If True and no inverse function is provided, uses a brute-force search to find the index. Defaults to False.
 - `exact_exception`:  If True, raises an exception if the term does not exactly match any sequence term. Defaults to True.
 
+#### Raises
+- `InversionError`: Raised if `naive_technic` is False and no inverse function is provided.
+- `ValueError`: Raised if `exact_exception` is True and the term is not found.
+
+### `count_terms_between_indices`
+Counts the number of terms between two indices in the sequence.
+
+#### Parameters
+- `index1`: The starting index.
+- `index2`: The ending index.
+
+
 ### `count_terms_between_terms`
-Counts the number of terms between two given terms in the sequence, using 
-the sequence's inverse function to find their indices.
+Counts the number of terms between two given terms in the sequence. It uses 
+the sequence's inverse function.
 
 This method is meaningful for sequences where a bijective (one-to-one and
 onto) relationship exists between terms and their indices.
@@ -242,6 +267,10 @@ onto) relationship exists between terms and their indices.
 - `term1`: The first term in the sequence.
 - `term2`: The second term in the sequence.
 
+#### Raises
+- `InversionError`: Raised if an inverse function has not been defined or is not
+applicable, indicating that term indices cannot be accurately determined.
+
 
 ---
 
@@ -249,4 +278,4 @@ onto) relationship exists between terms and their indices.
 
 - **Isaac Houngue** - [Fasfox](https://fasfox.com)
 
-Feel free to contribute, report issues, or suggest enhancements. Happy sequencing! 📈
+Feel free to contribute, report issues, or suggest enhancements. Did you know that sequences are everywhere 🤔? Happy sequencing! 📈

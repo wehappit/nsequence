@@ -538,7 +538,6 @@ class NSequence(object):
     ):
         iter_limit = iter_limit or self.MAX_BRUTE_FORCE_ITERATION
         starting_position = starting_position or self.INITIAL_POSITION
-        # https://stackoverflow.com/questions/1995418/python-generator-expression-vs-yield
         for position in range(starting_position, starting_position + iter_limit):
             # Index of the position .i.e the `position_th` index
             position_index = self._indexing_func(position)
@@ -738,8 +737,9 @@ class NSequence(object):
 
         if func_arity != expected_arity:
             raise ArityMismatchError(
-                f"Function {getattr(func_to_validate, '__name__', '')} expected "
-                f"{expected_arity} argument(s) but got {func_arity}"
+                f"Function {getattr(func_to_validate, '__name__', '')} is expected to have "
+                f"{expected_arity} as arity (.i.e the number of parameters) "
+                f"but it actually has {func_arity}"
             )
 
     @staticmethod
@@ -748,6 +748,7 @@ class NSequence(object):
         for param, value in kwargs.items():
             if value is None:
                 continue
-
-            # assert not not_none_kwargs, msg
+            # Either uncomment the next statement in the nest release
+            # or delete this function
+            # assert not not_none_kwargs, msg # TBD
             not_none_kwargs[param] = value

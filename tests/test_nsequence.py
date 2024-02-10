@@ -98,8 +98,10 @@ class TestNSequenceInstantiation(unittest.TestCase):
                 inverse_func="bad object as func",  # noqa
             )
 
-        self.assertTrue(
-            "Function f_xyz expected 1 argument(s), but got 3", context.value.args[0]
+        self.assertEqual(
+            "Function f_xyz is expected to have 1 as arity (.i.e the number of parameters) "
+            "but it actually has 3",
+            context.value.args[0]
         )
 
     def test_should_not_instantiate_nsequence_if_any_bad_object_provided_as_function(
@@ -113,7 +115,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
                 inverse_func="bad object as func",  # noqa
             )
 
-        self.assertTrue(
+        self.assertEqual(
             "Expect a function, but got `bad object as func`", context.value.args[0]
         )
 
@@ -125,7 +127,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
                 indexing_func="bad object as func",  # noqa
             )
 
-        self.assertIn(
+        self.assertEqual(
             "Expect a function, but got `bad object as func`", context.value.args[0]
         )
 
