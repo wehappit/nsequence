@@ -225,7 +225,7 @@ Compute a list of sequence terms located between two given terms, inclusive.
 - `term1`: The first term.
 - `term2`: The second term.
 
-#### Raises:
+#### Raises
 - `InversionError`: Raised if `inverse_func` is not defined.
 - `ValueError`: Raised if calculated indices are not valid or if `term1_index` or
 `term2_index` are not integers.
@@ -244,7 +244,7 @@ Returns the sum of the sequence up to the nth term.
 - `naive_technic`: If True and no inverse function is provided, uses a brute-force search to find the index. Defaults to False.
 - `exact_exception`:  If True, raises an exception if the term does not exactly match any sequence term. Defaults to True.
 
-#### Raises:
+#### Raises
 - `InversionError`: Raised if `naive_technic` is False and no inverse function is provided.
 - `ValueError`: Raised if `exact_exception` is True and the term is not found.
 
@@ -267,7 +267,7 @@ onto) relationship exists between terms and their indices.
 - `term1`: The first term in the sequence.
 - `term2`: The second term in the sequence.
 
-#### Raises:
+#### Raises
 - `InversionError`: Raised if an inverse function has not been defined or is not
 applicable, indicating that term indices cannot be accurately determined.
 
