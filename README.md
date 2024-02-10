@@ -96,7 +96,7 @@ each reminder instance and its timing. Specifically, the reminder function
 is defined as `R(n) = D + F*n`, where `R(n)` represents the `n-th` reminder 
 date.
 
-NSequence then be used to make your code shine with the versatile methods available
+NSequence then be used to make your code shine with the methods available.
 
 ```python
 
@@ -159,6 +159,10 @@ Create a sequence instance
 
 - `initial_index`: The starting index for the sequence. This parameter is ignored if `indexing_func` is provided, as the initial index will then be derived from the indexing function.
 
+#### Raises
+- `ArityMismatchError`: Raised if the provided function does not accept exactly one argument.
+- `TypeError`: Raised if the provided argument is not a callable function.
+
 ### `nth_term`
 Compute the sequence term at the given position
 
@@ -172,6 +176,8 @@ Determines the sequence position of a given index, useful when custom indexing i
 #### Parameters
 - `index`: The index for which to find the corresponding sequence position.
 
+#### Raises
+- `IndexNotFoundError`: If the user provides custom indexing function and the index is not found within the bounds set by `NSequence.POSITION_LIMIT` 
 
 ### `nearest_entry`
 Finds the nearest sequence entry (both the index and the term) to a given term.
@@ -183,6 +189,9 @@ Finds the nearest sequence entry (both the index and the term) to a given term.
 - `iter_limit`: The maximum number of iterations for the search (ignored if `inversion_technic` is True).
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
+#### Raises
+- `NotImplementedError`: If the calculation fails, due to any of these exceptions: `TypeError`, `ValueError`, `ArithmeticError`.
+
 ### `nearest_term_index`
 Finds the index of the nearest term to a given value in the sequence
 
@@ -192,6 +201,9 @@ Finds the index of the nearest term to a given value in the sequence
 - `starting_position`: The starting position for the iterative search (ignored if `inversion_technic` is True).
 - `iter_limit`: The maximum number of iterations for the search (ignored if `inversion_technic` is True).
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
+
+#### Raises
+- `NotImplementedError`: If the calculation fails, due to any of these exceptions: `TypeError`, `ValueError`, `ArithmeticError`. 
 
 ### `nearest_term`
 Retrieves the term in the sequence that is nearest to a specified value.
@@ -203,6 +215,9 @@ Retrieves the term in the sequence that is nearest to a specified value.
 - `iter_limit`: The maximum number of iterations for the search (ignored if `inversion_technic` is True).
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
+#### Raises
+- `NotImplementedError`: If the calculation fails, due to any of these exceptions: `TypeError`, `ValueError`, `ArithmeticError`.
+
 
 ### `terms_between_terms`
 Compute a list of sequence terms located between two given terms, inclusive.
@@ -210,6 +225,11 @@ Compute a list of sequence terms located between two given terms, inclusive.
 #### Parameters
 - `term1`: The first term.
 - `term2`: The second term.
+
+#### Raises:
+- `InversionError`: If `inverse_func` is not defined.
+- `ValueError`: If calculated indices are not valid or if `term1_index` or
+`term2_index` are not integers.
 
 ### `sum_up_to_nth_term`
 Calculate the sum of the sequence up to the nth term. 
@@ -225,6 +245,9 @@ Returns the sum of the sequence up to the nth term.
 - `naive_technic`: If True and no inverse function is provided, uses a brute-force search to find the index. Defaults to False.
 - `exact_exception`:  If True, raises an exception if the term does not exactly match any sequence term. Defaults to True.
 
+#### Raises:
+- `InversionError`: If `naive_technic` is False and no inverse function is provided.
+- `ValueError`: If `exact_exception` is True and the term is not found.
 
 ### `count_terms_between_indices`
 Counts the number of terms between two indices in the sequence.
@@ -245,11 +268,15 @@ onto) relationship exists between terms and their indices.
 - `term1`: The first term in the sequence.
 - `term2`: The second term in the sequence.
 
+#### Raises:
+- `InversionError`: If an inverse function has not been defined or is not
+applicable, indicating that term indices cannot be accurately determined.
+
 
 ---
 
 ## Authors
 
-- **Isaac Houngue** - [<hjisaac>](https://www.linkedin.com/in/hjisaac?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app)
+- **Isaac Houngue** - [Fasfox](https://fasfox.com)
 
-Feel free to contribute, report issues, or suggest enhancements. Happy sequencing! 📈
+Feel free to contribute, report issues, or suggest enhancements. Do you know that sequence is everywhere 🤔?  Happy sequencing! 📈
