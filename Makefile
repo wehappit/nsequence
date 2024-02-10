@@ -4,20 +4,20 @@
 
 # Install dependencies
 install:
-	@pip install nsequence[dev]
+	pip install nsequence[dev]
 
 # Run tests
 test:
-	@pytest
+	pytest
 
 # Bump version
 bump:
-	@echo "Please run the bumping command directly for the meantime using bumpver :3"
+	@echo "Please run the bumping command directly for the meantime using bumpver"
 
 # Coverage
 coverage:
-	@pytest --cov=nsequence --cov-report html
+	pytest --cov=nsequence --cov-report html
 
 # Clean
 clean:
-	@rm -rf build/ dist/ *.egg-info/ .coverage
+	rm -rf build/ dist/ *.egg-info/ .coverage
