@@ -17,7 +17,7 @@ keywords = ["progression", "arithmetic progression", "sequence", "fonctional seq
 requires-python = ">=3.9"
 
 [project.optional-dependencies]
-dev = ["black", "bumpver", "pip-tools", "pytest"]
+dev = ["black", "bumpver", "pytest", "pytest-cov"]
 
 [project.urls]
 homepage = "https://github.com/wehappit/nsequence"

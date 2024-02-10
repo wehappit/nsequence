@@ -20,7 +20,6 @@ LRU_CACHE_MAX_SIZE = 128
 
 
 class NSequence(object):
-
     POSITION_LIMIT = 1_000_000
 
     MAX_BRUTE_FORCE_ITERATION = POSITION_LIMIT
@@ -427,7 +426,7 @@ class NSequence(object):
     def nearest_entry(
         self,
         term_neighbor: Any,
-        inversion_technic= True,
+        inversion_technic=True,
         starting_position=None,
         iter_limit=None,
         prefer_left_term=True,
@@ -461,11 +460,12 @@ class NSequence(object):
         starting_position = starting_position or self.INITIAL_POSITION
 
         if inversion_technic:
-            nearest_term_index, nearest_term = (
-                self.__inversely_get_sequence_nearest_entry(
-                    term_neighbor,
-                    prefer_left_term=prefer_left_term,
-                )
+            (
+                nearest_term_index,
+                nearest_term,
+            ) = self.__inversely_get_sequence_nearest_entry(
+                term_neighbor,
+                prefer_left_term=prefer_left_term,
             )
         else:
             try:
@@ -536,7 +536,6 @@ class NSequence(object):
     def __create_sequence_pairs_generator(
         self, iter_limit=None, starting_position=None
     ):
-
         iter_limit = iter_limit or self.MAX_BRUTE_FORCE_ITERATION
         starting_position = starting_position or self.INITIAL_POSITION
         # https://stackoverflow.com/questions/1995418/python-generator-expression-vs-yield
@@ -644,7 +643,6 @@ class NSequence(object):
                 term_neighbor_index,
             )
         ):
-
             # The provided term is a term of the sequence so do nothing
             return term_neighbor_index, term_neighbor
 
@@ -685,7 +683,6 @@ class NSequence(object):
 
     @classmethod
     def __validate_positions(cls, *values_to_validate):
-
         try:
             cls.__validate_integers(*values_to_validate, min_value=1)
         except ValueError as exc:
@@ -713,7 +710,6 @@ class NSequence(object):
         min_value = constraints.get("min_value", -float("inf"))
 
         for value in values_to_validate:
-
             # Raise an exception if `value` is not an integer or does not respect the constraints
             if not cls.__is_integer(value) or min_value > value:
                 constraints_msg = (
@@ -748,7 +744,6 @@ class NSequence(object):
 
     @staticmethod
     def __validate_mutually_exclusive_params(msg: str, **kwargs):
-
         not_none_kwargs = {}
         for param, value in kwargs.items():
             if value is None:
