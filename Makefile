@@ -12,7 +12,7 @@ test:
 
 # Bump version
 bump:
-	@echo "Please run the command directly for the meantime"
+	@echo "Please run the bumping command directly for the meantime using bumpver :3"
 
 # Coverage
 coverage:
