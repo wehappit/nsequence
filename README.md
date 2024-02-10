@@ -190,7 +190,7 @@ Finds the nearest sequence entry (both the index and the term) to a given term.
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
 #### Raises
-- `NotImplementedError`: If the calculation fails, due to any of these exceptions: `TypeError`, `ValueError`, `ArithmeticError`.
+- `NotImplementedError`: If the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
 
 ### `nearest_term_index`
 Finds the index of the nearest term to a given value in the sequence
@@ -203,7 +203,7 @@ Finds the index of the nearest term to a given value in the sequence
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
 #### Raises
-- `NotImplementedError`: If the calculation fails, due to any of these exceptions: `TypeError`, `ValueError`, `ArithmeticError`. 
+- `NotImplementedError`: If the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
 
 ### `nearest_term`
 Retrieves the term in the sequence that is nearest to a specified value.
@@ -216,8 +216,7 @@ Retrieves the term in the sequence that is nearest to a specified value.
 - `prefer_left_term`: Preference for the left term in case of equidistant terms.
 
 #### Raises
-- `NotImplementedError`: If the calculation fails, due to any of these exceptions: `TypeError`, `ValueError`, `ArithmeticError`.
-
+- `NotImplementedError`: If the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
 
 ### `terms_between_terms`
 Compute a list of sequence terms located between two given terms, inclusive.
@@ -279,4 +278,4 @@ applicable, indicating that term indices cannot be accurately determined.
 
 - **Isaac Houngue** - [Fasfox](https://fasfox.com)
 
-Feel free to contribute, report issues, or suggest enhancements. Do you know that sequence is everywhere 🤔?  Happy sequencing! 📈
+Feel free to contribute, report issues, or suggest enhancements. Did you know that sequences are everywhere 🤔? Happy sequencing! 📈
