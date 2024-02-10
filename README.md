@@ -78,7 +78,7 @@ index_of_8 = invertible_sequence.index_of_term(8)
 terms_between_5_and_10 = invertible_sequence.terms_between_indices(5, 10)
 ```
 
-## Real-world Usage Example
+## Real-world Usage
 
 Imagine you're developing a complex event reminder system, where specific data _could_ be 
 attached to each reminder. You don't want to save in db, reminders to which the user 
@@ -93,7 +93,7 @@ term represents a distinct instance of the scheduled event reminder.
 Consider an event requiring reminders every `F` hours starting from a date `D`. 
 We can establish a direct mathematical relationship between 
 each reminder instance and its timing. Specifically, the reminder function 
-is defined as `R(n) = D + F*x`, where `R(n)` represents the `n-th` reminder 
+is defined as `R(n) = D + F*n`, where `R(n)` represents the `n-th` reminder 
 date.
 
 NSequence then be used to make your code shine with the versatile methods available
@@ -172,12 +172,6 @@ Determines the sequence position of a given index, useful when custom indexing i
 #### Parameters
 - `index`: The index for which to find the corresponding sequence position.
 
-### `count_terms_between_indices`
-Counts the number of terms between two indices in the sequence.
-
-#### Parameters
-- `index1`: The starting index.
-- `index2`: The ending index.
 
 ### `nearest_entry`
 Finds the nearest sequence entry (both the index and the term) to a given term.
@@ -231,9 +225,18 @@ Returns the sum of the sequence up to the nth term.
 - `naive_technic`: If True and no inverse function is provided, uses a brute-force search to find the index. Defaults to False.
 - `exact_exception`:  If True, raises an exception if the term does not exactly match any sequence term. Defaults to True.
 
+
+### `count_terms_between_indices`
+Counts the number of terms between two indices in the sequence.
+
+#### Parameters
+- `index1`: The starting index.
+- `index2`: The ending index.
+
+
 ### `count_terms_between_terms`
-Counts the number of terms between two given terms in the sequence, using 
-the sequence's inverse function to find their indices.
+Counts the number of terms between two given terms in the sequence. It uses 
+the sequence's inverse function.
 
 This method is meaningful for sequences where a bijective (one-to-one and
 onto) relationship exists between terms and their indices.
@@ -247,6 +250,6 @@ onto) relationship exists between terms and their indices.
 
 ## Authors
 
-- **Isaac Houngue** - [Fasfox](https://fasfox.com)
+- **Isaac Houngue** - [<hjisaac>](https://www.linkedin.com/in/hjisaac?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app)
 
 Feel free to contribute, report issues, or suggest enhancements. Happy sequencing! 📈
