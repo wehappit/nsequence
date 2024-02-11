@@ -24,6 +24,14 @@ You can install NSequence using pip:
 pip install nsequence
 ```
 
+## Testing
+
+You can install the dependencies to run the tests using pip:
+
+```bash
+pip install nsequence[dev]
+```
+
 ## Getting Started
 
 ```python
