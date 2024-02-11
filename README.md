@@ -153,7 +153,7 @@ especially in the cases where the return type of the sequence's function is not 
 
 ## Key Methods
 
-![Image of the principe](./docs/img.png)
+![The concept's image](./docs/img.png)
 
 ---
 ### Constructor .i.e `__init__`
