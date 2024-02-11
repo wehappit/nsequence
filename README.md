@@ -95,16 +95,17 @@ planning purposes, you want to be able to retrieve
 for a given event recall data (or metadata inferred from the related event) for a 
 given period in the past (or future).
 
-The reminder system can be conceptualized as a mathematical sequence, where each 
+The set of reminders can be conceptualized as a mathematical sequence, where each 
 term represents a distinct instance of the scheduled event reminder.
 
 Consider an event requiring reminders every `F` hours starting from a date `D`. 
 We can establish a direct mathematical relationship between 
-each reminder instance and its timing. Specifically, the reminder function 
-is defined as `R(n) = D + F*n`, where `R(n)` represents the `n-th` reminder 
+each reminder instance and its timing. And we can then define the reminder sequence 
+using the formular `R(n) = D + F*(n-1)` or `R(n) = (D-F) + F*n`, where `R(n)` represents the `n-th` reminder 
 date.
 
-NSequence then be used to make your code shine with the methods available.
+NSequence can be utilized to enhance your code's capabilities in solving the
+previous problem by leveraging the available methods.
 
 ```python
 
@@ -113,19 +114,20 @@ from nsequence import NSequence
 
 # Define start date and frequency in hours
 start_date = datetime(2024, 1, 1)
-frequency_hours = 2
+frequency_hours = timedelta(hours=2)
 
 # Define the reminder function using the R(n) formula
 def reminder_func(n):
-    # R(n) = start_date + n * frequency_hours
-    return start_date + timedelta(hours=frequency_hours * (n - 1))
+    # R(n) = start_date + frequency_hours * (n-1)
+    return start_date + frequency_hours * (n-1)
 
 def reminder_inverse_func(reminder_date):
-    return (reminder_date - start_date) / frequency_hours
+    return (reminder_date - start_date + frequency_hours) / frequency_hours
 
 # Initialize NSequence with the reminder function
 reminder_sequence = NSequence(
     func=reminder_func, 
+    # Set initial_index to 1
     initial_index=1, 
     inverse_func=reminder_inverse_func
 )
@@ -151,6 +153,9 @@ especially in the cases where the return type of the sequence's function is not 
 
 ## Key Methods
 
+![Image of the principe](./docs/img.png)
+
+---
 ### Constructor .i.e `__init__`
 
 Initializes a new sequence instance.
