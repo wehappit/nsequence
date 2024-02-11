@@ -20,4 +20,4 @@ coverage:
 
 # Clean
 clean:
-	rm -rf build/ dist/ *.egg-info/ .coverage
+	rm -rf build/ dist/ *.egg-info/ .coverage htmlcov
