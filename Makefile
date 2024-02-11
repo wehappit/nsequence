@@ -14,9 +14,13 @@ test:
 build:
 	python -m build && twine check dist/*
 
-# Test upload to PYPI
-test-upload:
+# Upload to TestPYPI
+test-pypi-upload:
 	twine upload -r testpypi dist/*
+
+# Upload to PYPI
+# pypi-upload:
+#	twine upload -r testpypi dist/*
 
 # Bump version
 bump:
