@@ -101,7 +101,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
         self.assertEqual(
             "Function f_xyz is expected to have 1 as arity (.i.e the number of parameters) "
             "but it actually has 3",
-            context.value.args[0]
+            context.value.args[0],
         )
 
     def test_should_not_instantiate_nsequence_if_any_bad_object_provided_as_function(
