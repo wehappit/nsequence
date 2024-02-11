@@ -10,9 +10,13 @@ install:
 test:
 	pytest
 
-# Run tests
+# Build
 build:
-	python -m build && twine check dist/*
+	python -m build && twine check
+
+# Test upload to PYPI
+test-upload:
+	twine upload -r testpypi dist/*
 
 # Bump version
 bump:
