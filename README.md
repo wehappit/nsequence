@@ -155,6 +155,7 @@ especially in the cases where the return type of the sequence's function is not 
 
 ![Image of the principe](./docs/img.png)
 
+---
 ### Constructor .i.e `__init__`
 
 Initializes a new sequence instance.
