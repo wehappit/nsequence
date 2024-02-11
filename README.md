@@ -279,6 +279,14 @@ onto) relationship exists between terms and their indices.
 - `InversionError`: Raised if an inverse function has not been defined or is not
 applicable, indicating that term indices cannot be accurately determined.
 
+## Properties
+
+### `initial_index`
+The initial index provided while creating the sequence.
+
+### `initial_term`
+The initial term of the sequence.
+
 
 ---
 

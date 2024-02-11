@@ -12,7 +12,7 @@ test:
 
 # Build
 build:
-	python -m build && twine check
+	python -m build && twine check dist/*
 
 # Test upload to PYPI
 test-upload:

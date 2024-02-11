@@ -200,6 +200,27 @@ class TestNthTermComputation(unittest.TestCase):
 
         self.assertEqual(nsequence1.nth_term(1000), 998999979)
 
+    def test_should_raise_position_related_exception_if_bad_position_provided(self):
+        """
+        Ensure that we raise `UnexpectedPositionError` exception when position is not valid
+        """
+
+        nsequence1 = NSequence(
+            func=identity_x,
+            indexing_func=cubic_x,
+        )
+
+        for bad_position in (0.1, -1, "0"):
+            with pytest.raises(UnexpectedPositionError) as exc:
+                nsequence1.nth_term(bad_position)  # noqa
+
+            # No need to match the full message here
+            self.assertIn(
+                "Expect `positions` to be tuple of integers (strictly greater than 0), "
+                f"but actually got ",
+                exc.value.message,
+            )
+
 
 class TestSumUpToNthTermComputation(unittest.TestCase):
     def test_should_fail_if_bad_position_is_provided(self):
@@ -212,9 +233,9 @@ class TestSumUpToNthTermComputation(unittest.TestCase):
             with pytest.raises(UnexpectedPositionError) as context:
                 sequence.sum_up_to_nth_term(bad_param)
 
-            self.assertIn(
+            self.assertEqual(
                 "Expect `positions` to be tuple of integers (strictly greater than 0), but actually "
-                "got a tuple of float(s) with non zero decimal(s) ",
+                f"got `{(bad_param,)}`",
                 context.value.message,
             )
 
@@ -597,7 +618,7 @@ class TestCountTermsBetweenIndices(unittest.TestCase):
             self.assertEqual(sequence1.count_terms_between_indices(10, 10), 1)
         self.assertIn(
             "Expect `positions` to be tuple of integers (strictly greater than 0), but actually "
-            "got a tuple of float(s) with non zero decimal(s) `",
+            "got ",
             exc_info.value.args[0],
         )
 
@@ -717,7 +738,66 @@ class TestNearestEntryComputation(unittest.TestCase):
 
         self.assertEqual(sequence.nearest_entry(25.54), (25, 390634))
 
-    # TODO: Tests for extra params
+    def test_should_compute_nearest_entry_using_starting_position_and_iter_limit_if_provided(
+        self,
+    ):
+        """
+        Ensure that the specified number of iterations, as determined by iter_limit and
+        starting_position, is precisely met by verifying the corresponding inner mocked
+        logic is invoked the appropriate number of times
+        """
+        # TODO:
+        pass
+
+
+class TestNearestTermComputation(unittest.TestCase):
+    def test_should_compute_nearest_term_naively_if_param_activated(self):
+        sequence = NSequence(
+            func=quartic_x,
+        )
+
+        # When the term is one entry of the sequence (the default `initial_index`)
+        self.assertEqual(sequence.nearest_term(25, inversion_technic=False), 25)
+
+        # When the term is not an entry of the sequence
+        self.assertEqual(sequence.nearest_term(30, inversion_technic=False), 25)
+
+    def test_should_compute_nearest_term_inversely_if_param_activated(self):
+        sequence = NSequence(
+            func=quartic_x,
+            # Here, the effectiveness of the inverse_func does not matter
+            inverse_func=identity_x,
+        )
+
+        # When the term is a term of the sequence
+        self.assertEqual(sequence.nearest_term_index(25), 25)
+
+        self.assertEqual(sequence.nearest_term_index(25.54), 25)
+
+
+class TestNearestTermIndexComputation(unittest.TestCase):
+    def test_should_compute_nearest_term_index_naively_if_param_activated(self):
+        sequence = NSequence(
+            func=quartic_x,
+        )
+
+        # When the term is one entry of the sequence (the default `initial_index`)
+        self.assertEqual(sequence.nearest_term_index(25, inversion_technic=False), 2)
+
+        # When the term is not an entry of the sequence
+        self.assertEqual(sequence.nearest_term_index(30, inversion_technic=False), 2)
+
+    def test_should_compute_nearest_term_index_inversely_if_param_activated(self):
+        sequence = NSequence(
+            func=quartic_x,
+            # Here, the effectiveness of the inverse_func does not matter
+            inverse_func=identity_x,
+        )
+
+        # When the term is a term of the sequence
+        self.assertEqual(sequence.nearest_term_index(25), 25)
+
+        self.assertEqual(sequence.nearest_term_index(25.54), 25)
 
 
 class TestNSequenceProperties(unittest.TestCase):

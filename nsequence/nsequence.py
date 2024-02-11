@@ -20,11 +20,13 @@ LRU_CACHE_MAX_SIZE = 128
 
 
 class NSequence(object):
+
     POSITION_LIMIT = 1_000_000
 
     MAX_BRUTE_FORCE_ITERATION = POSITION_LIMIT
 
     DEFAULT_INITIAL_INDEX = 0
+
     INITIAL_POSITION = 1
 
     def __init__(
@@ -102,6 +104,8 @@ class NSequence(object):
             Any: The nth term of the sequence. It depends on the sequence function.
 
         """
+
+        self.__validate_positions(n)
 
         return self._func(self._indexing_func(n))
 
@@ -456,9 +460,6 @@ class NSequence(object):
         or `starting_position` are provided with `inversion_technic` set to True.
         """
 
-        iter_limit = iter_limit or self.MAX_BRUTE_FORCE_ITERATION
-        starting_position = starting_position or self.INITIAL_POSITION
-
         if inversion_technic:
             (
                 nearest_term_index,
@@ -468,9 +469,12 @@ class NSequence(object):
                 prefer_left_term=prefer_left_term,
             )
         else:
+
+            iter_limit = iter_limit or self.MAX_BRUTE_FORCE_ITERATION
+            starting_position = starting_position or self.INITIAL_POSITION
+
             try:
                 nearest_term_index, nearest_term = (
-                    #
                     self.__naively_get_sequence_nearest_entry(
                         term_neighbor,
                         starting_position=starting_position,
@@ -687,7 +691,7 @@ class NSequence(object):
         except ValueError as exc:
             raise UnexpectedPositionError(
                 "Expect `positions` to be tuple of integers (strictly greater than 0), but actually "
-                f"got a tuple of float(s) with non zero decimal(s) `{values_to_validate}`"
+                f"got `{values_to_validate}`"
             ) from exc
 
     @classmethod
