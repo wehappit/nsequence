@@ -10,6 +10,10 @@ install:
 test:
 	pytest
 
+# Run tests
+build:
+	python -m build && twine check dist/*
+
 # Bump version
 bump:
 	@echo "Please run the bumping command directly for the meantime using bumpver"

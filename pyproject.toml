@@ -18,6 +18,7 @@ requires-python = ">=3.9"
 
 [project.optional-dependencies]
 dev = ["black", "bumpver", "pytest", "pytest-cov"]
+build = ["build", "twine"]
 
 [project.urls]
 homepage = "https://github.com/wehappit/nsequence"
