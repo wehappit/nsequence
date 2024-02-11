@@ -5,7 +5,7 @@ NSequence is a Python library designed for handling progressions or sequences. I
 
 ## Key Features
 
-- **Versatile Sequence Handling**: NSequence support every type of sequence, as long as it can be expressed with unary function.
+- **Versatile Sequence Handling**: NSequence supports every type of sequence, as long as it can be expressed with a unary function.
 
 - **Error Handling**: The library includes robust error handling for scenarios such as arity mismatches, unexpected positions or indices, inversion errors, and index not found situations.
 

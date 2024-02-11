@@ -20,7 +20,7 @@ test-pypi-upload:
 
 # Upload to PYPI
 # pypi-upload:
-#	twine upload -r testpypi dist/*
+#	twine upload dist/*
 
 # Bump version
 bump:
