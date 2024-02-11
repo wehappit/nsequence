@@ -153,7 +153,7 @@ especially in the cases where the return type of the sequence's function is not 
 
 ### Constructor .i.e `__init__`
 
-Create a sequence instance
+Initializes a new sequence instance.
 
 #### Parameters
 
@@ -172,7 +172,7 @@ Create a sequence instance
 - `TypeError`: Raised if the provided argument is not a callable function.
 
 ### `nth_term`
-Compute the sequence term at the given position
+Computes the sequence term at the given position.
 
 #### Parameters
 - `position`: Position in the sequence to calculate the term for.
@@ -185,7 +185,7 @@ Determines the sequence position of a given index, useful when custom indexing i
 - `index`: The index for which to find the corresponding sequence position.
 
 #### Raises
-- `IndexNotFoundError`: Raised if the user provides custom indexing function and the index is not found within the bounds set by `NSequence.POSITION_LIMIT` 
+- `IndexNotFoundError`: Raised if the user provides custom indexing function and the index is not found within the bounds set by `NSequence.POSITION_LIMIT`. 
 
 ### `nearest_entry`
 Finds the nearest sequence entry (both the index and the term) to a given term.
@@ -201,7 +201,7 @@ Finds the nearest sequence entry (both the index and the term) to a given term.
 - `NotImplementedError`: Raised if the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
 
 ### `nearest_term_index`
-Finds the index of the nearest term to a given value in the sequence
+Finds the index of the nearest term to a given value in the sequence.
 
 #### Parameters
 - `term_neighbor`: The value to find the nearest sequence term to.
@@ -227,7 +227,7 @@ Retrieves the term in the sequence that is nearest to a specified value.
 - `NotImplementedError`: Raised if the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
 
 ### `terms_between_terms`
-Compute a list of sequence terms located between two given terms, inclusive.
+Computes a list of sequence terms located between two given terms, inclusive.
 
 #### Parameters
 - `term1`: The first term.
@@ -239,7 +239,7 @@ Compute a list of sequence terms located between two given terms, inclusive.
 `term2_index` are not integers.
 
 ### `sum_up_to_nth_term`
-Calculate the sum of the sequence up to the nth term. 
+Calculates the sum of the sequence up to the nth term. 
 
 #### Parameters
 - `n`: The position up to which the sum is to be calculated. Must be a positive integer.
