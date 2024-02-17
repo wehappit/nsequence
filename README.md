@@ -15,6 +15,9 @@ NSequence is a Python library designed for handling progressions or sequences. I
 
 - **Nearest Term Search**: NSequence allows you to find the index of the nearest term to a given value in the sequence. It provides flexibility in handling tie-breakers and preferences.
 
+- **Iterator Protocol Support**: NSequence supports the iterator protocol, allowing seamless iteration over sequence elements.
+
+- **Sequence Protocol Support**: NSequence adheres to the sequence protocol, ensuring compatibility with other Python sequences and enabling familiar operations such as indexing and slicing.
 
 ## Installation
 
@@ -170,7 +173,11 @@ Initializes a new sequence instance.
 
 - `indexing_inverse_func`: The inverse of `indexing_func`, allowing for the determination of sequence positions from indices.
 
-- `initial_index`: The starting index for the sequence. This parameter is ignored if `indexing_func` is provided, as the initial index will then be derived from the indexing function.
+- `initial_index`: The starting index for the sequence, defaults to 0. This parameter is ignored if `indexing_func` is provided, as the initial index will then be derived from the indexing function.
+
+-  `position_limit` An optional limit to the number of positions available in the sequence .i.e the length of the sequence. Defaults to 1,000,000.
+
+
 
 #### Raises
 - `ArityMismatchError`: Raised if the provided function does not accept exactly one argument.
@@ -190,7 +197,7 @@ Determines the sequence position of a given index, useful when custom indexing i
 - `index`: The index for which to find the corresponding sequence position.
 
 #### Raises
-- `IndexNotFoundError`: Raised if the user provides custom indexing function and the index is not found within the bounds set by `NSequence.POSITION_LIMIT`. 
+- `IndexNotFoundError`: Raised if the user provides custom indexing function and the index is not found sequence's position_limit. 
 
 ### `nearest_entry`
 Finds the nearest sequence entry (both the index and the term) to a given term.
@@ -230,6 +237,18 @@ Retrieves the term in the sequence that is nearest to a specified value.
 
 #### Raises
 - `NotImplementedError`: Raised if the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
+- `InversionError`: Raised if `inversion_technic` is set to True and the sequence does not have `inverse_func`.
+
+### `count_terms_between_terms_neighbors`
+Counts the number of terms located between the nearest terms to two specified values. This method is particularly useful for sequences where each term
+has a unique and identifiable neighbor, allowing for the counting of terms that lie directly
+between two specific values.
+
+#### Parameters
+- `term_neighbor1`: The first value.  This method finds the nearest term to this value
+                 that does not prefer the left term, effectively preferring the right or equal term.
+- `term_neighbor2`: The second value. The value of the second neighbor. Unlike for `neighbor1`, this method finds the
+                 nearest term to this value that prefers the left term, if such a term exists.
 
 ### `terms_between_terms`
 Computes a list of sequence terms located between two given terms, inclusive.
@@ -254,12 +273,12 @@ Returns the sum of the sequence up to the nth term.
 
 #### Parameters
 - `term`:  The sequence term to find the index for.
-- `naive_technic`: If True and no inverse function is provided, uses a brute-force search to find the index. Defaults to False.
+- `inversion_technic`: If True and no inverse function is provided, uses a brute-force search to find the index. Defaults to True.
 - `exact_exception`:  If True, raises an exception if the term does not exactly match any sequence term. Defaults to True.
 
 #### Raises
-- `InversionError`: Raised if `naive_technic` is False and no inverse function is provided.
-- `ValueError`: Raised if `exact_exception` is True and the term is not found.
+- `InversionError`: Raised if `inversion_technic` is True and no inverse function is provided.
+- `ValueError`: Raised if `exact_exception` is True and the term is not found in the sequence.
 
 ### `count_terms_between_indices`
 Counts the number of terms between two indices in the sequence.
@@ -292,11 +311,29 @@ The initial index provided while creating the sequence.
 ### `initial_term`
 The initial term of the sequence.
 
+### `position_limit`
+The actual length of the sequence.
+
+## More
+The support for Sequence and Iterator protocol allows you to do things like this:
+
+```python
+my_sequence = NSequence(func=lambda x: x**3 + 4, position_limit=20)
+
+# Print each element/term of the sequence
+for term in my_sequence:
+    print(term)
+
+# Slice to get a range of terms
+print(my_sequence[start:end:step])
+
+```
+Read about iterator protocol [here](https://docs.python.org/3/c-api/iter.html) and sequence protocol [here](https://docs.python.org/3/c-api/sequence.html).
 
 ---
 
 ## Authors
 
-- **Isaac Houngue** - [Fasfox](https://fasfox.com)
+- **Isaac Houngue** [<hjisaac.h at gmail>](mailto:hjisaac.h@gmail.com)
 
 Feel free to contribute, report issues, or suggest enhancements. Did you know that sequences are everywhere 🤔? Happy sequencing! 📈
