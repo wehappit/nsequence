@@ -173,7 +173,7 @@ Initializes a new sequence instance.
 
 - `indexing_inverse_func`: The inverse of `indexing_func`, allowing for the determination of sequence positions from indices.
 
-- `initial_index`: The starting index for the sequence. This parameter is ignored if `indexing_func` is provided, as the initial index will then be derived from the indexing function.
+- `initial_index`: The starting index for the sequence, defaults to 0. This parameter is ignored if `indexing_func` is provided, as the initial index will then be derived from the indexing function.
 
 -  `position_limit` An optional limit to the number of positions available in the sequence .i.e the length of the sequence. Defaults to 1,000,000.
 
@@ -325,11 +325,10 @@ for term in my_sequence:
     print(term)
 
 # Slice to get a range of terms
-
 print(my_sequence[start:end:step])
 
 ```
-Read about iterator protocol [here](https://docs.python.org/3/c-api/iter.html) and sequence protocol [here](https://docs.python.org/3/c-api/sequence.html)
+Read about iterator protocol [here](https://docs.python.org/3/c-api/iter.html) and sequence protocol [here](https://docs.python.org/3/c-api/sequence.html).
 
 ---
 
