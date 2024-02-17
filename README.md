@@ -15,9 +15,9 @@ NSequence is a Python library designed for handling progressions or sequences. I
 
 - **Nearest Term Search**: NSequence allows you to find the index of the nearest term to a given value in the sequence. It provides flexibility in handling tie-breakers and preferences.
 
-- **Support for Iterator Protocol**: NSequence supports the iterator protocol, allowing seamless iteration over sequence elements.
+- **Iterator Protocol Support**: NSequence supports the iterator protocol, allowing seamless iteration over sequence elements.
 
-- **Sequence Protocol Compatibility**: NSequence adheres to the sequence protocol, ensuring compatibility with other Python sequences and enabling familiar operations such as indexing and slicing.
+- **Sequence Protocol Support**: NSequence adheres to the sequence protocol, ensuring compatibility with other Python sequences and enabling familiar operations such as indexing and slicing.
 
 ## Installation
 
