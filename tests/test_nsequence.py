@@ -1,5 +1,6 @@
-import unittest
 import pytest
+import unittest
+import unittest.mock
 
 from nsequence.nsequence import NSequence
 from nsequence.exceptions import (
@@ -35,7 +36,7 @@ def harmonic_x(x):
     return 1 / x
 
 
-def sextique_x(x):
+def sextic_x(x):
     return x**6 - 10 * (x**5) + 35 * (x**4) - 50 * (x**3) + 24 * (x**2)
 
 
@@ -64,6 +65,7 @@ class TestNSequenceInstantiation(unittest.TestCase):
                 inverse_func=identity_x,
                 indexing_func=identity_x,
                 indexing_inverse_func=identity_x,
+                position_limit=10000,
                 initial_index=0,
             ),
             NSequence,
@@ -327,8 +329,8 @@ class TestIndexOfTermComputation(unittest.TestCase):
             sequence.index_of_term(3)
             self.assertEqual(
                 "Cannot calculate `index_of_term` for sequence without `inverse_func` and with "
-                "`naive_technic` set to `False`. You need either to provide `inverse_func` or set "
-                "`naive_technic` to `True`",
+                "`inversion_technic` set to `True`. You need either to provide `inverse_func` or set "
+                "`inversion_technic` to `False`",
                 exc_info.value.message,
             )
 
@@ -341,10 +343,10 @@ class TestIndexOfTermComputation(unittest.TestCase):
 
         # Ensure the result is correct for the first term.
         # The default `initial_index` is 0 and the first term is 9
-        self.assertEqual(sequence1.index_of_term(9, naive_technic=True), 0)
+        self.assertEqual(sequence1.index_of_term(9, inversion_technic=False), 0)
 
         # quartic_x(8) = 4105
-        self.assertEqual(sequence1.index_of_term(4105, naive_technic=True), 8)
+        self.assertEqual(sequence1.index_of_term(4105, inversion_technic=False), 8)
 
         # Ensure we get correct results if `initial_index` was set
 
@@ -352,10 +354,10 @@ class TestIndexOfTermComputation(unittest.TestCase):
 
         # Ensure the result is correct for the first term.
         # quartic_x(10) = 10009
-        self.assertEqual(sequence2.index_of_term(10009, naive_technic=True), 10)
+        self.assertEqual(sequence2.index_of_term(10009, inversion_technic=False), 10)
 
         # quartic_x(14) = 38425
-        self.assertEqual(sequence2.index_of_term(38425, naive_technic=True), 14)
+        self.assertEqual(sequence2.index_of_term(38425, inversion_technic=False), 14)
 
         sequence3 = NSequence(
             func=quartic_x,
@@ -364,11 +366,11 @@ class TestIndexOfTermComputation(unittest.TestCase):
 
         # Ensure the result is correct for the first term.
         # quartic_x(cubic_x(1)) = 10 and cubic_x(1) = -1
-        self.assertEqual(sequence3.index_of_term(10, naive_technic=True), -1)
+        self.assertEqual(sequence3.index_of_term(10, inversion_technic=False), -1)
 
         # quartic_x(cubic_x(14)) = 42083880609690 and cubic_x(14) = 2547
         self.assertEqual(
-            sequence3.index_of_term(42083880609690, naive_technic=True), 2547
+            sequence3.index_of_term(42083880609690, inversion_technic=False), 2547
         )
 
         # Sequence having descending indexing function
@@ -380,21 +382,21 @@ class TestIndexOfTermComputation(unittest.TestCase):
 
         # Ensure the result is correct for the first term.
         # quartic_x(-cubic_x(1)) = 10 and -cubic_x(1) = 1
-        self.assertEqual(sequence4.index_of_term(10, naive_technic=True), 1)
+        self.assertEqual(sequence4.index_of_term(10, inversion_technic=False), 1)
 
         # quartic_x(-cubic_x(14)) = 42083880609690 and -cubic_x(14) = -2547
         self.assertEqual(
-            sequence4.index_of_term(42083880609690, naive_technic=True), -2547
+            sequence4.index_of_term(42083880609690, inversion_technic=False), -2547
         )
 
     def test_should_return_the_first_index_if_func_is_injective_and_naive_technic_is_activated(
         self,
     ):
         sequence = NSequence(
-            func=sextique_x,
+            func=sextic_x,
         )
 
-        self.assertEqual(sequence.index_of_term(0, naive_technic=True), 0)
+        self.assertEqual(sequence.index_of_term(0, inversion_technic=False), 0)
 
     def test_should_compute_index_of_term_using_inverse_func_if_provided(self):
         sequence = NSequence(
@@ -419,7 +421,7 @@ class TestIndexOfTermComputation(unittest.TestCase):
         )
 
         self.assertEqual(
-            sequence.index_of_term(4, naive_technic=True),
+            sequence.index_of_term(4, inversion_technic=False),
             # quartic_x(4) = 265
             265,
         )
@@ -708,7 +710,7 @@ class TestNearestEntryComputation(unittest.TestCase):
         # When the term is not an entry of the sequence
         self.assertEqual(sequence.nearest_entry(30, inversion_technic=False), (2, 25))
 
-    def test_should_nearest_entry_naive_computation_should_fail_if_bad_sequence_function_returns_bad_datatype(
+    def test_should_not_compute_nearest_entry_naively_if_sequence_function_returns_bad_datatype(
         self,
     ):
         sequence = NSequence(
@@ -726,6 +728,11 @@ class TestNearestEntryComputation(unittest.TestCase):
             "May be you should override the default `nearest_entry` implementation.",
         )
 
+    def test_should_compute_nearest_entry_inversely_using_inverse_func_if_param_activated(
+        self,
+    ):
+        pass
+
     def test_should_compute_nearest_entry_inversely_if_param_activated(self):
         sequence = NSequence(
             func=quartic_x,
@@ -738,6 +745,211 @@ class TestNearestEntryComputation(unittest.TestCase):
 
         self.assertEqual(sequence.nearest_entry(25.54), (25, 390634))
 
+    def test_should_not_compute_nearest_entry_naively_if_no_inverse_function_but_inversion_technic_activated(
+        self,
+    ):
+        # The default value of `inversion_technic` is True
+        sequence = NSequence(
+            func=identity_x,
+        )
+
+        with pytest.raises(InversionError) as exc:
+            self.assertEqual(sequence.nearest_entry(25), (2, 25))
+
+        self.assertEqual(
+            exc.value.args[0],
+            "Cannot calculate `nearest_entry` for sequence without `inverse_func` and with "
+            "`inversion_technic` set to `True`. You need either to provide `inverse_func` or set "
+            "`inversion_technic` to `False` to use the naive approach",
+        )
+
+    def test_should_prefer_left_term_according_to_parameter_value_if_using_inversion_technic(
+        self,
+    ):
+        # The default value of `inversion_technic` is True
+
+        # These are the quartic_x first 6 terms [9, 10, 25, 90, 265, 634]
+        # And 57.5 is 25 / 90
+        def quartic_inverse_x(y):
+            return (y - 9) ** 0.25
+
+        sequence1 = NSequence(
+            func=quartic_x,
+            inverse_func=quartic_inverse_x,
+        )
+
+        self.assertEqual(
+            sequence1.nearest_entry(
+                57.5,
+            ),
+            # prefer_left_term is True by default
+            (2, 25),
+        )
+
+        self.assertEqual(
+            sequence1.nearest_entry(
+                57.5,
+                prefer_left_term=True,
+            ),
+            (2, 25),
+        )
+
+        # Test right term preference
+        self.assertEqual(
+            sequence1.nearest_entry(
+                57.5,
+                prefer_left_term=False,
+            ),
+            (3, 90),
+        )
+
+        sequence2 = NSequence(
+            func=quartic_x,
+            # Incorrect inverse func
+            # Just to test that the logic really use the inverse_func
+            inverse_func=identity_x,
+        )
+
+        # Test left term preference
+        self.assertEqual(
+            sequence2.nearest_entry(
+                57.5,
+                prefer_left_term=True,
+            ),
+            (57, 10556010),
+        )
+
+        # Test right term preference
+        self.assertEqual(
+            sequence2.nearest_entry(
+                57.5,
+                prefer_left_term=False,
+            ),
+            # Yeah, cause of the incorrect inverse func the equi-distance condition
+            # never happened
+            (57, 10556010),
+        )
+
+    def test_should_prefer_left_term_according_to_parameter_value_if_using_naive_technic(
+        self,
+    ):
+        sequence1 = NSequence(
+            func=quartic_x,
+        )
+
+        # Test left term preference
+        self.assertEqual(
+            sequence1.nearest_entry(
+                57.5,
+                inversion_technic=False,
+            ),
+            # prefer_left_term is True by default
+            (2, 25),
+        )
+
+        # Test left term preference
+        self.assertEqual(
+            sequence1.nearest_entry(
+                57.5,
+                inversion_technic=False,
+                prefer_left_term=True,
+            ),
+            (2, 25),
+        )
+
+        # Test right term preference
+        self.assertEqual(
+            sequence1.nearest_entry(
+                57.5,
+                inversion_technic=False,
+                prefer_left_term=False,
+            ),
+            (3, 90),
+        )
+
+        sequence2 = NSequence(
+            func=quartic_x,
+            # Incorrect inverse func
+            # Just to test that here we don't use that function if inversion_technic if False
+            inverse_func=identity_x,
+        )
+
+        # Test left term preference
+        self.assertEqual(
+            sequence2.nearest_entry(
+                57.5,
+                prefer_left_term=True,
+                inversion_technic=False,
+            ),
+            (2, 25),
+        )
+
+        # Test right term preference
+        self.assertEqual(
+            sequence2.nearest_entry(
+                57.5,
+                prefer_left_term=False,
+                inversion_technic=False,
+            ),
+            (3, 90),
+        )
+
+    def test_should_compute_nearest_neighbor_if_it_is_a_sequence_term_and_using_naive_technic(
+        self,
+    ):
+        sequence1 = NSequence(
+            func=quartic_x,
+        )
+
+        # Test left term preference
+        self.assertEqual(
+            sequence1.nearest_entry(
+                25,
+                inversion_technic=False,
+            ),
+            # prefer_left_term is True by default
+            (2, 25),
+        )
+
+        sequence2 = NSequence(
+            func=lambda x: 37,
+            position_limit=50,
+        )
+
+        # Test left term preference
+        self.assertEqual(
+            sequence2.nearest_entry(25, inversion_technic=False, prefer_left_term=True),
+            # prefer_left_term is True by default
+            (0, 37),
+        )
+
+        # Test right term preference
+        self.assertEqual(
+            sequence2.nearest_entry(
+                25, inversion_technic=False, prefer_left_term=False
+            ),
+            # prefer_left_term is True by default
+            (49, 37),
+        )
+
+    def test_should_return_term_neighbor_characteristics_if_it_is_a_sequence_term_and_using_inverse_technic(
+        self,
+    ):
+        # The function is supposed to be bijective.
+        sequence = NSequence(
+            func=quartic_x,
+        )
+
+        # Test left term preference
+        self.assertEqual(
+            sequence.nearest_entry(
+                25,
+                inversion_technic=False,
+            ),
+            # prefer_left_term is True by default
+            (2, 25),
+        )
+
     def test_should_compute_nearest_entry_using_starting_position_and_iter_limit_if_provided(
         self,
     ):
@@ -746,8 +958,35 @@ class TestNearestEntryComputation(unittest.TestCase):
         starting_position, is precisely met by verifying the corresponding inner mocked
         logic is invoked the appropriate number of times
         """
-        # TODO:
-        pass
+        nsequence = NSequence(
+            func=identity_x,
+        )
+
+        starting_position = 10
+        iter_limit = 4
+
+        with unittest.mock.patch(
+            "nsequence.nsequence.NSequence._create_sequence_pairs_generator"
+        ) as indexing_func_mock:
+            nsequence.nearest_entry(
+                23,
+                inversion_technic=False,
+                starting_position=starting_position,
+                iter_limit=iter_limit,
+            )
+
+            indexing_func_mock.assert_called_once_with(
+                starting_position=starting_position, iter_limit=iter_limit
+            )
+
+        self.assertEqual(
+            sum(
+                1 for _ in nsequence._create_sequence_pairs_generator(
+                    starting_position=starting_position, iter_limit=iter_limit
+                )
+            ),
+            4,
+        )
 
 
 class TestNearestTermComputation(unittest.TestCase):
@@ -802,11 +1041,11 @@ class TestNearestTermIndexComputation(unittest.TestCase):
 
 class TestNSequenceProperties(unittest.TestCase):
     def test_initial_term(self):
-        self.assertEqual(NSequence(func=sextique_x).initial_term, 0)
+        self.assertEqual(NSequence(func=sextic_x).initial_term, 0)
         self.assertEqual(NSequence(func=linear_x, initial_index=4).initial_term, 26)
 
     def test_initial_index(self):
-        self.assertEqual(NSequence(func=sextique_x, initial_index=50).initial_index, 50)
+        self.assertEqual(NSequence(func=sextic_x, initial_index=50).initial_index, 50)
 
         # When indexing func provided, initial_index is ignored
         self.assertEqual(
@@ -815,6 +1054,142 @@ class TestNSequenceProperties(unittest.TestCase):
             ).initial_index,
             10,
         )
+
+
+class TestIteratorProtocolSupport(unittest.TestCase):
+    def test_iter_returns_self(self):
+        sequence = NSequence(
+            func=quartic_x,
+        )
+
+        self.assertIs(sequence.__iter__(), sequence)
+
+    def test_next_returns_expected_elements(self):
+        sequence = NSequence(
+            func=quartic_x,
+            position_limit=5,
+        )
+
+        expected_sequence = [9, 10, 25, 90, 265]
+        for i, expected_element in enumerate(expected_sequence):
+            self.assertEqual(next(sequence), expected_element)
+
+        with self.assertRaises(StopIteration):
+            next(sequence)
+
+    def test_for_loop_iteration(self):
+        sequence = NSequence(
+            func=quartic_x,
+            position_limit=5,
+        )
+
+        expected_sequence = [9, 10, 25, 90, 265]
+        actual_sequence = []
+        for element in sequence:
+            actual_sequence.append(element)
+
+        self.assertEqual(actual_sequence, expected_sequence)
+
+
+class TestSequenceProtocolSupport(unittest.TestCase):
+    def test_should_support_bracket_syntax_zero_position_based_indexing_if_no_indexing_func_provided(
+        self,
+    ):
+        # Sequence with the default initial_index
+        sequence1 = NSequence(
+            func=quartic_x,
+            position_limit=100,
+        )
+
+        sequence2 = NSequence(
+            func=quartic_x,
+            initial_index=5,
+            position_limit=100,
+        )
+
+        self.assertEqual(sequence1[0], quartic_x(0))
+
+        self.assertEqual(sequence1[-100], quartic_x(0))
+
+        for i in range(100):
+            self.assertEqual(sequence1[i], quartic_x(i))
+
+            self.assertEqual(sequence1[-(i + 1)], quartic_x(100 - i - 1))
+
+        # Ensure the interface is the same as for "list"
+
+        with self.assertRaises(IndexError):
+            for i in range(100, 101, 180):
+                _ = sequence1[100]
+
+        with self.assertRaises(IndexError):
+            for i in (-102, -140, -101):
+                _ = sequence1[-i]
+
+        self.assertEqual(sequence2[0], quartic_x(0 + 5))
+
+        self.assertEqual(sequence2[-100], quartic_x(0 + 5))
+
+        for i in range(100):
+            self.assertEqual(sequence2[i], quartic_x(i + 5))
+
+            self.assertEqual(sequence2[-(i + 1)], quartic_x(100 - i - 1 + 5))
+
+        # Ensure the interface is the same as for "list"
+
+        with self.assertRaises(IndexError):
+            for i in range(100, 101, 180):
+                _ = sequence2[100]
+
+        with self.assertRaises(IndexError):
+            for i in (-102, -140, -101):
+                _ = sequence2[-i]
+
+    def test_should_support_bracket_syntax_zero_position_based_indexing(self):
+        sequence1 = NSequence(
+            func=quartic_x,
+            indexing_func=linear_x,
+            position_limit=100,
+        )
+
+        self.assertEqual(sequence1[0], quartic_x(linear_x(1)))
+
+        self.assertEqual(sequence1[-100], quartic_x(linear_x(1)))
+
+        for i in range(100):
+            self.assertEqual(sequence1[i], quartic_x(linear_x(i + 1)))
+
+            self.assertEqual(sequence1[-(i + 1)], quartic_x(linear_x(100 - i)))
+
+        # Ensure the interface is the same as for "list"
+
+        with self.assertRaises(IndexError):
+            for i in range(100, 101, 180):
+                _ = sequence1[100]
+
+        with self.assertRaises(IndexError):
+            for i in (-102, -140, -101):
+                _ = sequence1[-i]
+
+
+class TestDefaultInternalIndexingFuncs(unittest.TestCase):
+    def test_internal_default_indexing_funcs(self):
+        sequence1 = NSequence(
+            func=quartic_x,
+            position_limit=100,
+        )
+
+        self.assertEqual(sequence1.position_of_index(0), 1)
+        self.assertEqual(sequence1.position_of_index(99), 100)
+
+        sequence2 = NSequence(
+            func=quartic_x,
+            initial_index=100,
+            position_limit=100,
+        )
+
+        self.assertEqual(sequence2.position_of_index(100), 1)
+        self.assertEqual(sequence2.position_of_index(200), 101)
 
 
 if __name__ == "__main__":
