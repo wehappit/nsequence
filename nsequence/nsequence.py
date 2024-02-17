@@ -561,12 +561,12 @@ class NSequence(Iterator, Sequence):
         try:
             _position_of_index = next(
                 p
-                for p in range(1, self.POSITION_LIMIT)
+                for p in range(1, self.position_limit)
                 if self._indexing_func(p) == index
             )
         except StopIteration as exc:
             raise IndexNotFoundError(
-                f"Index {index} not found within the first {self.POSITION_LIMIT} positions "
+                f"Index {index} not found within {self.position_limit} positions "
                 f"of the sequence."
             ) from exc
 

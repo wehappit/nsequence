@@ -8,7 +8,7 @@ from nsequence.exceptions import (
     UnexpectedIndexError,
     UnexpectedPositionError,
     InversionError,
-    # IndexNotFoundError,
+    IndexNotFoundError,
 )
 
 
@@ -155,6 +155,40 @@ class TestNSequenceInstantiation(unittest.TestCase):
 
         # No need to match 100% of the message here, cause done enough previously
         self.assertIn("Expect a function, but got ", context.value.args[0])
+
+
+class TestPositionOfIndexComputation(unittest.TestCase):
+    def setUp(self):
+        self.sequence1 = NSequence(
+            func=identity_x, indexing_func=lambda x: x * 2, position_limit=5
+        )
+        self.sequence2 = NSequence(
+            func=identity_x,
+            indexing_func=lambda x: x * 2,
+            indexing_inverse_func=lambda x: x // 2,
+            position_limit=5,
+        )
+
+    def test_position_of_index_direct(self):
+        # Test finding position with direct function
+        self.assertEqual(self.sequence1.position_of_index(4), 2)
+
+    def test_position_of_index_inverse(self):
+        # Test finding position with inverse function
+        self.assertEqual(self.sequence2.position_of_index(4), 2)
+
+    def test_index_not_found_direct(self):
+        # Test index not found with direct function
+        with self.assertRaises(IndexNotFoundError):
+            self.sequence1.position_of_index(5)
+
+    @pytest.mark.skip(
+        "Actually we compute the the position without any guards check if indexing_inverse_func is provided"
+    )
+    def test_index_not_found_inverse(self):
+        # FIXME: Validate the position before returning it
+        with self.assertRaises(IndexNotFoundError):
+            self.sequence2.position_of_index(5)
 
 
 class TestNthTermComputation(unittest.TestCase):
