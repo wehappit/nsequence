@@ -14,8 +14,7 @@ from .exceptions import (
 )
 
 # DOCME: Doc about functions monotony and continuity impact
-# TODO: Fix docs
-# TODO: Document
+
 number = int | float
 
 LRU_CACHE_MAX_SIZE = 128
@@ -645,12 +644,11 @@ class NSequence(Iterator, Sequence):
                 nearest_term = term
 
             if prefer_left_term and distance == 0:
-                # Early exit if an exact match is found and `prefer_left_term`
-                # The term provided is actually a term of the sequence
-
-                # We could have just returned if the distance is zero.
-                # But may be the client code provided an one-to-one function for the
-                # sequence and wants the last most indices that is giving zero as distance
+                # Early exit if an exact match is found and `prefer_left_term`.
+                # The term provided is actually a term of the sequence. We could
+                # have just returned if the distance is zero. But the client code
+                # may provide an one-to-one function for the sequence and wants the
+                # last most indices that is giving zero as distance.
                 break
 
         # Return the index and the corresponding term as a tuple

@@ -234,7 +234,7 @@ Retrieves the term in the sequence that is nearest to a specified value.
 
 #### Raises
 - `NotImplementedError`: Raised if the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
-
+- `InversionError`: Raised if `inversion_technic` is set to True and the sequence does not have `inverse_func`.
 ### `terms_between_terms`
 Computes a list of sequence terms located between two given terms, inclusive.
 
@@ -295,6 +295,9 @@ The initial index provided while creating the sequence.
 
 ### `initial_term`
 The initial term of the sequence.
+
+### `position_limit`
+The actual length of the sequence.
 
 
 ---
