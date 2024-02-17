@@ -197,7 +197,7 @@ Determines the sequence position of a given index, useful when custom indexing i
 - `index`: The index for which to find the corresponding sequence position.
 
 #### Raises
-- `IndexNotFoundError`: Raised if the user provides custom indexing function and the index is not found sequence's position_limit. 
+- `IndexNotFoundError`: Raised if the user provides custom indexing function and the index is not found sequence's `position_limit`. 
 
 ### `nearest_entry`
 Finds the nearest sequence entry (both the index and the term) to a given term.
