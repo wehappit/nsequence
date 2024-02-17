@@ -110,15 +110,22 @@ class NSequence(Iterator, Sequence):
         return self._position_limit
 
     def __getitem__(self, zero_position: int) -> Any:
-        _zero_position = zero_position
-        if _zero_position < 0:
-            # Convert negative position to positive position
-            # This helps to support the negative indexing like for "list"
-            _zero_position = len(self) + _zero_position
+        if isinstance(zero_position, int):
+            _zero_position = zero_position
+            if _zero_position < 0:
+                # Convert negative position to positive position
+                # This helps to support the negative indexing like for "list"
+                _zero_position = len(self) + _zero_position
 
-        if _zero_position < 0 or _zero_position >= self._position_limit:
-            raise IndexError("Index out bounds")
-        return self.nth_term(_zero_position + 1)
+            if _zero_position < 0 or _zero_position >= self._position_limit:
+                raise IndexError("Index out bounds")
+            return self.nth_term(_zero_position + 1)
+        elif isinstance(zero_position, slice):
+            # Handle slice object
+            start, stop, step = zero_position.indices(self._position_limit)
+            return [self.nth_term(i + 1) for i in range(start, stop, step)]
+        else:
+            raise TypeError(f"Invalid argument type. int or slice expected but got {zero_position}")
 
     def nth_term(self, n: int) -> Any:
         """
@@ -575,6 +582,11 @@ class NSequence(Iterator, Sequence):
         """The initial term of the sequence."""
         return self._func(self._initial_index)
 
+    @property
+    def position_limit(self) -> int:
+        """"""
+        return self._position_limit
+
     def _create_sequence_pairs_generator(self, iter_limit=None, starting_position=None):
         iter_limit = iter_limit or self._position_limit
         starting_position = starting_position or self.INITIAL_POSITION
@@ -725,13 +737,14 @@ class NSequence(Iterator, Sequence):
         return isinstance(value, number) and value % 1 == 0
 
     @classmethod
-    def _validate_positions(cls, *values_to_validate):
+    def _validate_positions(cls, *values_to_validate, min_value=None, max_value=None):
+        min_value = min_value or cls.INITIAL_POSITION
         try:
-            cls._validate_integers(*values_to_validate, min_value=1)
+            cls._validate_integers(*values_to_validate, min_value=min_value, max_value=max_value)
         except ValueError as exc:
             raise UnexpectedPositionError(
-                "Expect `positions` to be tuple of integers (strictly greater than 0), but actually "
-                f"got `{values_to_validate}`"
+                f"Expect `positions` to be tuple of integers (strictly greater than 0 and less than the "
+                f"specified position_limit), but actually got `{values_to_validate}`"
             ) from exc
 
     @classmethod
@@ -751,10 +764,16 @@ class NSequence(Iterator, Sequence):
 
         # Add more constraints if needed
         min_value = constraints.get("min_value", -float("inf"))
+        if min_value is None:
+            min_value = -float("inf")
+
+        max_value = constraints.get("max_value", float("inf"))
+        if max_value is None:
+            max_value = float("inf")
 
         for value in values_to_validate:
             # Raise an exception if `value` is not an integer or does not respect the constraints
-            if not cls._is_integer(value) or min_value > value:
+            if not cls._is_integer(value) or min_value > value or max_value < value:
                 constraints_msg = (
                     f" with constraints {constraints}" if constraints else ""
                 )

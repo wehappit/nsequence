@@ -218,7 +218,7 @@ class TestNthTermComputation(unittest.TestCase):
 
             # No need to match the full message here
             self.assertIn(
-                "Expect `positions` to be tuple of integers (strictly greater than 0), "
+                "Expect `positions` to be tuple of integers (strictly greater than 0 and less than the specified position_limit), "
                 f"but actually got ",
                 exc.value.message,
             )
@@ -236,7 +236,8 @@ class TestSumUpToNthTermComputation(unittest.TestCase):
                 sequence.sum_up_to_nth_term(bad_param)
 
             self.assertEqual(
-                "Expect `positions` to be tuple of integers (strictly greater than 0), but actually "
+                "Expect `positions` to be tuple of integers (strictly greater than 0 and less than "
+                "the specified position_limit), but actually "
                 f"got `{(bad_param,)}`",
                 context.value.message,
             )
@@ -389,7 +390,7 @@ class TestIndexOfTermComputation(unittest.TestCase):
             sequence4.index_of_term(42083880609690, inversion_technic=False), -2547
         )
 
-    def test_should_return_the_first_index_if_func_is_injective_and_naive_technic_is_activated(
+    def test_should_return_the_first_index_if_func_is_one_to_one_func_and_naive_technic_is_activated(
         self,
     ):
         sequence = NSequence(
@@ -619,7 +620,8 @@ class TestCountTermsBetweenIndices(unittest.TestCase):
         with pytest.raises(UnexpectedPositionError) as exc_info:
             self.assertEqual(sequence1.count_terms_between_indices(10, 10), 1)
         self.assertIn(
-            "Expect `positions` to be tuple of integers (strictly greater than 0), but actually "
+            "Expect `positions` to be tuple of integers (strictly greater than 0 and less than "
+            "the specified position_limit), but actually "
             "got ",
             exc_info.value.args[0],
         )
@@ -727,11 +729,6 @@ class TestNearestEntryComputation(unittest.TestCase):
             "Failed to compute the `nearest_entry` for 25 "
             "May be you should override the default `nearest_entry` implementation.",
         )
-
-    def test_should_compute_nearest_entry_inversely_using_inverse_func_if_param_activated(
-        self,
-    ):
-        pass
 
     def test_should_compute_nearest_entry_inversely_if_param_activated(self):
         sequence = NSequence(
@@ -1054,6 +1051,11 @@ class TestNSequenceProperties(unittest.TestCase):
             ).initial_index,
             10,
         )
+    def test_position_limit(self):
+        self.assertEqual(NSequence(func=sextic_x, position_limit=50).position_limit, 50)
+        sequence = NSequence(func=sextic_x)
+        self.assertEqual(sequence.position_limit, sequence.POSITION_LIMIT)
+
 
 
 class TestIteratorProtocolSupport(unittest.TestCase):
@@ -1171,6 +1173,36 @@ class TestSequenceProtocolSupport(unittest.TestCase):
             for i in (-102, -140, -101):
                 _ = sequence1[-i]
 
+    def test_should_support_slicing_syntax(self):
+        sequence = NSequence(
+            func=identity_x,
+            position_limit=100,
+        )
+
+        # Tests slicing with positive indices
+        self.assertEqual(sequence[1:4], [1, 2, 3])
+
+        # Tests slicing with negative indices assuming sequence has at least 5 elements
+        self.assertEqual(sequence[-5:-2], [sequence[-5], sequence[-4], sequence[-3]])
+
+        # Tests slicing with a step
+        self.assertEqual(sequence[1:5:2], [1, 3])
+
+        # Tests slicing that exceeds the sequence bounds
+        # The sequence contains 100 terms
+        self.assertEqual(sequence[98:102], [98, 99])
+
+        # Tests an empty slice
+        self.assertEqual(sequence[10:10], [])
+
+        # Tests slicing with a negative step, should reverse the slice
+        self.assertEqual(sequence[4:1:-1], [4, 3, 2])
+
+        # Tests a complete slice with no start or end but with a step
+        self.assertEqual(sequence[::2], [sequence[i] for i in range(0, len(sequence), 2)])
+
+        # Tests reversing the sequence with a slice
+        self.assertEqual(sequence[::-1], [sequence.nth_term(100 - i) for i in range(100)])
 
 class TestDefaultInternalIndexingFuncs(unittest.TestCase):
     def test_internal_default_indexing_funcs(self):
