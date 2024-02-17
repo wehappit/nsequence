@@ -120,12 +120,12 @@ class NSequence(Iterator, Sequence):
                 raise IndexError("NSequence instance out of range")
             return self.nth_term(_position + 1)
         elif isinstance(position, slice):
-            # Add support for slices
+            # Add support for `slice`
             start, stop, step = position.indices(self._position_limit)
             return [self.nth_term(i + 1) for i in range(start, stop, step)]
         else:
             raise TypeError(
-                f"Invalid argument type. int or slice expected, but got {position}"
+                f"Invalid argument type. `int` or `slice` expected, but got {position}"
             )
 
     def nth_term(self, n: int) -> Any:
@@ -313,11 +313,29 @@ class NSequence(Iterator, Sequence):
 
         return self._count_positions_between(index1_position, index2_position)
 
-    def count_terms_between_terms_neighbors(self, neighbor1, neighbor2):
-        # Let's do this only for invertible sequences
+    def count_terms_between_terms_neighbors(
+        self, term_neighbor1: Any, term_neighbor2: Any
+    ):
+        """
+        Counts the number of terms located between the nearest terms to two specified neighbors
+        within an invertible sequence. This method is particularly useful for sequences where each term
+        has a unique and identifiable neighbor, allowing for the counting of terms that lie directly
+        between two specific values.
+        Args:
+            term_neighbor1: The value of the first neighbor. This method finds the nearest term to this value
+                 that does not prefer the left term, effectively preferring the right or equal term.
+            term_neighbor2: The value of the second neighbor. Unlike for `neighbor1`, this method finds the
+                 nearest term to this value that prefers the left term, if such a term exists.
+
+        Returns:
+            - int: The count of terms located between the nearest terms to `neighbor1` and `neighbor2`, inclusive.
+                   This count is based on the sequence's ability to identify and enumerate terms between specific
+                   points, relying on the sequence's invertibility to accurately find and count these terms.
+
+        """
         return self.count_terms_between_terms(
-            self.nearest_term(neighbor1, prefer_left_term=False),
-            self.nearest_term(neighbor2, prefer_left_term=True),
+            self.nearest_term(term_neighbor1, prefer_left_term=False),
+            self.nearest_term(term_neighbor2, prefer_left_term=True),
         )
 
     def terms_between_terms(self, term1: Any, term2: Any):
@@ -559,9 +577,7 @@ class NSequence(Iterator, Sequence):
             return self._indexing_inverse_func(index)
         try:
             _position_of_index = next(
-                p
-                for p in range(1, POSITION_LIMIT)
-                if self._indexing_func(p) == index
+                p for p in range(1, POSITION_LIMIT) if self._indexing_func(p) == index
             )
         except StopIteration as exc:
             raise IndexNotFoundError(

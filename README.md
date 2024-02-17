@@ -15,6 +15,9 @@ NSequence is a Python library designed for handling progressions or sequences. I
 
 - **Nearest Term Search**: NSequence allows you to find the index of the nearest term to a given value in the sequence. It provides flexibility in handling tie-breakers and preferences.
 
+- **Support for Iterator Protocol**: NSequence supports the iterator protocol, allowing seamless iteration over sequence elements.
+
+- **Sequence Protocol Compatibility**: NSequence adheres to the sequence protocol, ensuring compatibility with other Python sequences and enabling familiar operations such as indexing and slicing.
 
 ## Installation
 
@@ -235,6 +238,18 @@ Retrieves the term in the sequence that is nearest to a specified value.
 #### Raises
 - `NotImplementedError`: Raised if the calculation fails, due to `TypeError`, `ValueError` or `ArithmeticError`.
 - `InversionError`: Raised if `inversion_technic` is set to True and the sequence does not have `inverse_func`.
+
+### `count_terms_between_terms_neighbors`
+Counts the number of terms located between the nearest terms to two specified values. This method is particularly useful for sequences where each term
+has a unique and identifiable neighbor, allowing for the counting of terms that lie directly
+between two specific values.
+
+#### Parameters
+- `term_neighbor1`: The first value.  This method finds the nearest term to this value
+                 that does not prefer the left term, effectively preferring the right or equal term.
+- `term_neighbor2`: The second value. The value of the second neighbor. Unlike for `neighbor1`, this method finds the
+                 nearest term to this value that prefers the left term, if such a term exists.
+
 ### `terms_between_terms`
 Computes a list of sequence terms located between two given terms, inclusive.
 
@@ -304,6 +319,6 @@ The actual length of the sequence.
 
 ## Authors
 
-- **Isaac Houngue** [<hjisaac.h at gmail.com>](hjisaac.h@gmail.com)
+- **Isaac Houngue** [<hjisaac.h>](mailto:hjisaac.h@gmail.com)
 
 Feel free to contribute, report issues, or suggest enhancements. Did you know that sequences are everywhere 🤔? Happy sequencing! 📈
