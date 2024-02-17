@@ -197,7 +197,7 @@ Determines the sequence position of a given index, useful when custom indexing i
 - `index`: The index for which to find the corresponding sequence position.
 
 #### Raises
-- `IndexNotFoundError`: Raised if the user provides custom indexing function and the index is not found sequence's position_limit. 
+- `IndexNotFoundError`: Raised if the user provides custom indexing function and the index is not found sequence's `position_limit`. 
 
 ### `nearest_entry`
 Finds the nearest sequence entry (both the index and the term) to a given term.
@@ -247,7 +247,7 @@ between two specific values.
 #### Parameters
 - `term_neighbor1`: The first value.  This method finds the nearest term to this value
                  that does not prefer the left term, effectively preferring the right or equal term.
-- `term_neighbor2`: The second value. The value of the second neighbor. Unlike for `neighbor1`, this method finds the
+- `term_neighbor2`: The second value. The value of the second neighbor. Unlike for `term_neighbor1`, this method finds the
                  nearest term to this value that prefers the left term, if such a term exists.
 
 ### `terms_between_terms`
@@ -315,7 +315,7 @@ The initial term of the sequence.
 The actual length of the sequence.
 
 ## More
-The support for Sequence and Iterator protocol allows you to do things like this:
+The support for iterator and sequence protocol allows you to do things like this:
 
 ```python
 my_sequence = NSequence(func=lambda x: x**3 + 4, position_limit=20)
@@ -328,7 +328,7 @@ for term in my_sequence:
 print(my_sequence[start:end:step])
 
 ```
-Read about iterator protocol [here](https://docs.python.org/3/c-api/iter.html) and sequence protocol [here](https://docs.python.org/3/c-api/sequence.html).
+Read about Iterator protocol [here](https://docs.python.org/3/c-api/iter.html) and sequence protocol [here](https://docs.python.org/3/c-api/sequence.html).
 
 ---
 
