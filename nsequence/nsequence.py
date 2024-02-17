@@ -20,14 +20,14 @@ number = int | float
 
 LRU_CACHE_MAX_SIZE = 128
 
+POSITION_LIMIT = 1_000_000
+
+DEFAULT_INITIAL_INDEX = 0
+
+INITIAL_POSITION = 1
+
 
 class NSequence(Iterator, Sequence):
-    POSITION_LIMIT = 1_000_000
-
-    DEFAULT_INITIAL_INDEX = 0
-
-    INITIAL_POSITION = 1
-
     def __init__(
         self,
         *,
@@ -79,27 +79,27 @@ class NSequence(Iterator, Sequence):
 
             self._indexing_func = indexing_func
             # Set the starting index of the sequence
-            self._initial_index = self._indexing_func(self.INITIAL_POSITION)
+            self._initial_index = self._indexing_func(INITIAL_POSITION)
         else:
             # Use the default indexing func and its inverse
             self._indexing_func = lambda position: self._initial_index + position - 1
             self._indexing_inverse_func = lambda index: index - self._initial_index + 1
             # Set the starting index of the sequence
-            self._initial_index = initial_index or self.DEFAULT_INITIAL_INDEX
+            self._initial_index = initial_index or DEFAULT_INITIAL_INDEX
 
-        self._position_limit = position_limit or self.POSITION_LIMIT
+        self._position_limit = position_limit or POSITION_LIMIT
 
     def __iter__(self):
-        self._iter_position = self.INITIAL_POSITION
+        self._iter_position = INITIAL_POSITION
         return self
 
     def __next__(self):
         if not hasattr(self, "_iter_position"):
-            # When you call next on the sequence directly
-            self._iter_position = self.INITIAL_POSITION
+            # When `next` is called on the sequence directly
+            self._iter_position = INITIAL_POSITION
 
         if self._iter_position > self._position_limit:
-            # "position" can task the right bounds value
+            # "position" can take the right value of the bounds
             raise StopIteration
 
         _position = self._iter_position
@@ -109,24 +109,24 @@ class NSequence(Iterator, Sequence):
     def __len__(self):
         return self._position_limit
 
-    def __getitem__(self, zero_position: int) -> Any:
-        if isinstance(zero_position, int):
-            _zero_position = zero_position
-            if _zero_position < 0:
-                # Convert negative position to positive position
-                # This helps to support the negative indexing like for "list"
-                _zero_position = len(self) + _zero_position
+    def __getitem__(self, position: int | slice) -> Any:
+        if isinstance(position, int):
+            _position = position
+            if _position < 0:
+                # Convert negative position to positive position to ensure
+                # that we support list-like negative indexing.
+                _position = len(self) + _position
 
-            if _zero_position < 0 or _zero_position >= self._position_limit:
-                raise IndexError("Index out bounds")
-            return self.nth_term(_zero_position + 1)
-        elif isinstance(zero_position, slice):
-            # Handle slice object
-            start, stop, step = zero_position.indices(self._position_limit)
+            if _position < 0 or _position >= self._position_limit:
+                raise IndexError("NSequence instance out of range")
+            return self.nth_term(_position + 1)
+        elif isinstance(position, slice):
+            # Add support for slices
+            start, stop, step = position.indices(self._position_limit)
             return [self.nth_term(i + 1) for i in range(start, stop, step)]
         else:
             raise TypeError(
-                f"Invalid argument type. int or slice expected but got {zero_position}"
+                f"Invalid argument type. int or slice expected, but got {position}"
             )
 
     def nth_term(self, n: int) -> Any:
@@ -227,7 +227,7 @@ class NSequence(Iterator, Sequence):
             position_of_index = next(
                 (
                     position
-                    for position in range(1, self.POSITION_LIMIT)
+                    for position in range(1, POSITION_LIMIT)
                     if self.nth_term(position) == term
                 ),
                 None,
@@ -409,7 +409,7 @@ class NSequence(Iterator, Sequence):
         """
 
         iter_limit = iter_limit or self._position_limit
-        starting_position = starting_position or self.INITIAL_POSITION
+        starting_position = starting_position or INITIAL_POSITION
 
         nearest_term_index, _ = self.nearest_entry(
             term_neighbor,
@@ -455,7 +455,7 @@ class NSequence(Iterator, Sequence):
         """
 
         iter_limit = iter_limit or self._position_limit
-        starting_position = starting_position or self.INITIAL_POSITION
+        starting_position = starting_position or INITIAL_POSITION
 
         _, nearest_term = self.nearest_entry(
             term_neighbor,
@@ -517,7 +517,7 @@ class NSequence(Iterator, Sequence):
             )
         else:
             iter_limit = iter_limit or self._position_limit
-            starting_position = starting_position or self.INITIAL_POSITION
+            starting_position = starting_position or INITIAL_POSITION
 
             try:
                 (
@@ -561,12 +561,12 @@ class NSequence(Iterator, Sequence):
         try:
             _position_of_index = next(
                 p
-                for p in range(1, self.position_limit)
+                for p in range(1, POSITION_LIMIT)
                 if self._indexing_func(p) == index
             )
         except StopIteration as exc:
             raise IndexNotFoundError(
-                f"Index {index} not found within {self.position_limit} positions "
+                f"Index {index} not found within {POSITION_LIMIT} positions "
                 f"of the sequence."
             ) from exc
 
@@ -586,12 +586,12 @@ class NSequence(Iterator, Sequence):
 
     @property
     def position_limit(self) -> int:
-        """"""
+        """The length of the sequence."""
         return self._position_limit
 
     def _create_sequence_pairs_generator(self, iter_limit=None, starting_position=None):
         iter_limit = iter_limit or self._position_limit
-        starting_position = starting_position or self.INITIAL_POSITION
+        starting_position = starting_position or INITIAL_POSITION
         for position in range(starting_position, starting_position + iter_limit):
             # Index of the position .i.e the `position_th` index
             position_index = self._indexing_func(position)
@@ -625,7 +625,7 @@ class NSequence(Iterator, Sequence):
         # This implementation makes sens only if the return type of the sequence's function is a float
 
         iter_limit = iter_limit or self._position_limit
-        starting_position = starting_position or self.INITIAL_POSITION
+        starting_position = starting_position or INITIAL_POSITION
 
         lazy_generated_pairs = self._create_sequence_pairs_generator(
             iter_limit=iter_limit, starting_position=starting_position
@@ -740,7 +740,7 @@ class NSequence(Iterator, Sequence):
 
     @classmethod
     def _validate_positions(cls, *values_to_validate, min_value=None, max_value=None):
-        min_value = min_value or cls.INITIAL_POSITION
+        min_value = min_value or INITIAL_POSITION
         try:
             cls._validate_integers(
                 *values_to_validate, min_value=min_value, max_value=max_value

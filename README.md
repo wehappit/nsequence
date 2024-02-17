@@ -172,6 +172,10 @@ Initializes a new sequence instance.
 
 - `initial_index`: The starting index for the sequence. This parameter is ignored if `indexing_func` is provided, as the initial index will then be derived from the indexing function.
 
+-  `position_limit` An optional limit to the number of positions available in the sequence .i.e the length of the sequence. Defaults to 1,000,000.
+
+
+
 #### Raises
 - `ArityMismatchError`: Raised if the provided function does not accept exactly one argument.
 - `TypeError`: Raised if the provided argument is not a callable function.
@@ -190,7 +194,7 @@ Determines the sequence position of a given index, useful when custom indexing i
 - `index`: The index for which to find the corresponding sequence position.
 
 #### Raises
-- `IndexNotFoundError`: Raised if the user provides custom indexing function and the index is not found within the bounds set by `NSequence.POSITION_LIMIT`. 
+- `IndexNotFoundError`: Raised if the user provides custom indexing function and the index is not found sequence's position_limit. 
 
 ### `nearest_entry`
 Finds the nearest sequence entry (both the index and the term) to a given term.
@@ -254,12 +258,12 @@ Returns the sum of the sequence up to the nth term.
 
 #### Parameters
 - `term`:  The sequence term to find the index for.
-- `naive_technic`: If True and no inverse function is provided, uses a brute-force search to find the index. Defaults to False.
+- `inversion_technic`: If True and no inverse function is provided, uses a brute-force search to find the index. Defaults to True.
 - `exact_exception`:  If True, raises an exception if the term does not exactly match any sequence term. Defaults to True.
 
 #### Raises
-- `InversionError`: Raised if `naive_technic` is False and no inverse function is provided.
-- `ValueError`: Raised if `exact_exception` is True and the term is not found.
+- `InversionError`: Raised if `inversion_technic` is True and no inverse function is provided.
+- `ValueError`: Raised if `exact_exception` is True and the term is not found in the sequence.
 
 ### `count_terms_between_indices`
 Counts the number of terms between two indices in the sequence.
@@ -297,6 +301,6 @@ The initial term of the sequence.
 
 ## Authors
 
-- **Isaac Houngue** - [Fasfox](https://fasfox.com)
+- **Isaac Houngue** [<hjisaac.h at gmail.com>](hjisaac.h@gmail.com)
 
 Feel free to contribute, report issues, or suggest enhancements. Did you know that sequences are everywhere 🤔? Happy sequencing! 📈

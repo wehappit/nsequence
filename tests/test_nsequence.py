@@ -2,7 +2,7 @@ import pytest
 import unittest
 import unittest.mock
 
-from nsequence.nsequence import NSequence
+from nsequence.nsequence import NSequence, POSITION_LIMIT
 from nsequence.exceptions import (
     ArityMismatchError,
     UnexpectedIndexError,
@@ -1088,7 +1088,7 @@ class TestNSequenceProperties(unittest.TestCase):
     def test_position_limit(self):
         self.assertEqual(NSequence(func=sextic_x, position_limit=50).position_limit, 50)
         sequence = NSequence(func=sextic_x)
-        self.assertEqual(sequence.position_limit, sequence.POSITION_LIMIT)
+        self.assertEqual(sequence.position_limit, POSITION_LIMIT)
 
 
 class TestIteratorProtocolSupport(unittest.TestCase):
