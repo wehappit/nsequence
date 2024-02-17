@@ -314,11 +314,27 @@ The initial term of the sequence.
 ### `position_limit`
 The actual length of the sequence.
 
+## More
+The support for Sequence and Iterator protocol allows you to do things like this:
+
+```python
+my_sequence = NSequence(func=lambda x: x**3 + 4, position_limit=20)
+
+# Print each element/term of the sequence
+for term in my_sequence:
+    print(term)
+
+# Slice to get a range of terms
+
+print(my_sequence[start:end:step])
+
+```
+Read about iterator protocol [here](https://docs.python.org/3/c-api/iter.html) and sequence protocol [here](https://docs.python.org/3/c-api/sequence.html)
 
 ---
 
 ## Authors
 
-- **Isaac Houngue** [<hjisaac.h>](mailto:hjisaac.h@gmail.com)
+- **Isaac Houngue** [<hjisaac.h at gmail>](mailto:hjisaac.h@gmail.com)
 
 Feel free to contribute, report issues, or suggest enhancements. Did you know that sequences are everywhere 🤔? Happy sequencing! 📈
