@@ -763,8 +763,6 @@ class TestNearestEntryComputation(unittest.TestCase):
     def test_should_prefer_left_term_according_to_parameter_value_if_using_inversion_technic(
         self,
     ):
-        # The default value of `inversion_technic` is True
-
         # These are the quartic_x first 6 terms [9, 10, 25, 90, 265, 634]
         # And 57.5 is 25 / 90
         def quartic_inverse_x(y):
@@ -978,7 +976,8 @@ class TestNearestEntryComputation(unittest.TestCase):
 
         self.assertEqual(
             sum(
-                1 for _ in nsequence._create_sequence_pairs_generator(
+                1
+                for _ in nsequence._create_sequence_pairs_generator(
                     starting_position=starting_position, iter_limit=iter_limit
                 )
             ),
@@ -1051,11 +1050,11 @@ class TestNSequenceProperties(unittest.TestCase):
             ).initial_index,
             10,
         )
+
     def test_position_limit(self):
         self.assertEqual(NSequence(func=sextic_x, position_limit=50).position_limit, 50)
         sequence = NSequence(func=sextic_x)
         self.assertEqual(sequence.position_limit, sequence.POSITION_LIMIT)
-
 
 
 class TestIteratorProtocolSupport(unittest.TestCase):
@@ -1199,10 +1198,15 @@ class TestSequenceProtocolSupport(unittest.TestCase):
         self.assertEqual(sequence[4:1:-1], [4, 3, 2])
 
         # Tests a complete slice with no start or end but with a step
-        self.assertEqual(sequence[::2], [sequence[i] for i in range(0, len(sequence), 2)])
+        self.assertEqual(
+            sequence[::2], [sequence[i] for i in range(0, len(sequence), 2)]
+        )
 
         # Tests reversing the sequence with a slice
-        self.assertEqual(sequence[::-1], [sequence.nth_term(100 - i) for i in range(100)])
+        self.assertEqual(
+            sequence[::-1], [sequence.nth_term(100 - i) for i in range(100)]
+        )
+
 
 class TestDefaultInternalIndexingFuncs(unittest.TestCase):
     def test_internal_default_indexing_funcs(self):

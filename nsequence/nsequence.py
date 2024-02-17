@@ -125,7 +125,9 @@ class NSequence(Iterator, Sequence):
             start, stop, step = zero_position.indices(self._position_limit)
             return [self.nth_term(i + 1) for i in range(start, stop, step)]
         else:
-            raise TypeError(f"Invalid argument type. int or slice expected but got {zero_position}")
+            raise TypeError(
+                f"Invalid argument type. int or slice expected but got {zero_position}"
+            )
 
     def nth_term(self, n: int) -> Any:
         """
@@ -740,7 +742,9 @@ class NSequence(Iterator, Sequence):
     def _validate_positions(cls, *values_to_validate, min_value=None, max_value=None):
         min_value = min_value or cls.INITIAL_POSITION
         try:
-            cls._validate_integers(*values_to_validate, min_value=min_value, max_value=max_value)
+            cls._validate_integers(
+                *values_to_validate, min_value=min_value, max_value=max_value
+            )
         except ValueError as exc:
             raise UnexpectedPositionError(
                 f"Expect `positions` to be tuple of integers (strictly greater than 0 and less than the "
