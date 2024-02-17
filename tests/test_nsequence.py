@@ -2,7 +2,7 @@ import pytest
 import unittest
 import unittest.mock
 
-from nsequence.nsequence import NSequence
+from nsequence.nsequence import NSequence, POSITION_LIMIT
 from nsequence.exceptions import (
     ArityMismatchError,
     UnexpectedIndexError,
@@ -183,7 +183,7 @@ class TestPositionOfIndexComputation(unittest.TestCase):
             self.sequence1.position_of_index(5)
 
     @pytest.mark.skip(
-        "Actually we compute the the position without any guards check if indexing_inverse_func is provided"
+        "Actually we compute the position without any guards check if `indexing_inverse_func` is provided"
     )
     def test_index_not_found_inverse(self):
         # FIXME: Validate the position before returning it
@@ -1088,7 +1088,7 @@ class TestNSequenceProperties(unittest.TestCase):
     def test_position_limit(self):
         self.assertEqual(NSequence(func=sextic_x, position_limit=50).position_limit, 50)
         sequence = NSequence(func=sextic_x)
-        self.assertEqual(sequence.position_limit, sequence.POSITION_LIMIT)
+        self.assertEqual(sequence.position_limit, POSITION_LIMIT)
 
 
 class TestIteratorProtocolSupport(unittest.TestCase):
