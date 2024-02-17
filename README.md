@@ -315,7 +315,7 @@ The initial term of the sequence.
 The actual length of the sequence.
 
 ## More
-The support for iterator and sequence protocol allows you to do things like this:
+The support for Sterator and sequence Protocol allows you to do things like this:
 
 ```python
 my_sequence = NSequence(func=lambda x: x**3 + 4, position_limit=20)
@@ -328,7 +328,7 @@ for term in my_sequence:
 print(my_sequence[start:end:step])
 
 ```
-Read about Iterator protocol [here](https://docs.python.org/3/c-api/iter.html) and sequence protocol [here](https://docs.python.org/3/c-api/sequence.html).
+Read about Iterator protocol [here](https://docs.python.org/3/c-api/iter.html) and Sequence protocol [here](https://docs.python.org/3/c-api/sequence.html).
 
 ---
 
